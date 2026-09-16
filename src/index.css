@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens from the UI mockup (UI_Mockup.html). Exposed to Tailwind v4 via
+ * @theme so utilities like `bg-page`, `text-navy`, `border-line`,
+ * `bg-blue-soft`, `font-display`, `rounded-lg`, `shadow-card` are generated.
+ * Add tokens here as new screens need them.
+ */
+@theme {
+  /* brand + status */
+  --color-red: #d61c38;
+  --color-red-soft: #fce9ec;
+  --color-red-border: #f2c2cb;
+
+  --color-green: #146936;
+  --color-green-soft: #e5f1e9;
+  --color-green-border: #b9dcc7;
+
+  --color-navy: #133052;
+  --color-navy-soft: #e8ecf3;
+  --color-navy-border: #c6d0df;
+
+  --color-blue: #2965a8;
+  --color-blue-soft: #eaf1f9;
+  --color-blue-border: #bfd4ea;
+
+  --color-light-blue: #3681d6;
+  --color-light-blue-soft: #edf4fd;
+  --color-light-blue-border: #c3dbf6;
+
+  /* text */
+  --color-ink: #1b222c;
+  --color-ink-2: #3e4754;
+  --color-ink-3: #6c7683;
+
+  /* structure */
+  --color-line: #e3e8ef;
+  --color-line-2: #d3dae3;
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f9fc;
+  --color-page: #f2f5f9;
+
+  /* type */
+  --font-display: 'Century Gothic', 'Questrial', 'Trebuchet MS', 'URW Gothic',
+    sans-serif;
+  --font-sans: Arial, 'Liberation Sans', Helvetica, sans-serif;
+
+  /* radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* elevation */
+  --shadow-card: 0 1px 2px rgba(19, 48, 82, 0.05), 0 1px 3px rgba(19, 48, 82, 0.06);
+  --shadow-pop: 0 12px 32px rgba(19, 48, 82, 0.16);
+
+  /* layout */
+  --spacing-sidebar: 236px;
+  /* nav flips from sidebar to top-bar + drawer below this (mockup's breakpoint) */
+  --breakpoint-nav: 900px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background: var(--color-blue-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-light-blue);
+  outline-offset: 2px;
+}
+
+/* Slim, theme-tinted scrollbars for every scroll region. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* transparent border + padding-box clip = a slim floating thumb on any surface */
+  background-color: var(--color-line-2);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-ink-3);
+}
