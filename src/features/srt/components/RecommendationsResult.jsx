@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import { Pager } from '@/components/ui/Pager';
 import { getErrorMessage } from '@/lib/apiError';
+import env from '@/config/env';
 import { CLAIM_CATEGORY_LABELS } from '@/features/srt/schemas/querySchema';
 import { useUpdateSelection } from '@/features/srt/hooks/useSrtRecommendation';
 
@@ -62,9 +62,79 @@ function QueryChips({ query, onEdit }) {
   );
 }
 
+function ChevronIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" {...props}>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+/** Multi-select dropdown — a checklist popover, closes on outside click or Escape. */
+function SourceMultiSelect({ options, selected, onToggle }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  const label = selected.size === 0 ? 'Source' : `Source (${selected.size})`;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={`flex items-center gap-1 rounded-sm border px-2 py-1.5 text-[12.5px] transition-colors ${
+          selected.size > 0
+            ? 'border-blue-border bg-blue-soft text-blue'
+            : 'border-line-2 bg-surface text-ink-2 hover:border-ink-3'
+        }`}
+      >
+        {label}
+        <ChevronIcon
+          className={`h-2.5 w-2.5 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open ? (
+        <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-md border border-line bg-surface p-1.5 shadow-pop">
+          {options.map((s) => (
+            <label
+              key={s}
+              className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] text-ink hover:bg-surface-2"
+            >
+              <input
+                type="checkbox"
+                checked={selected.has(s)}
+                onChange={() => onToggle(s)}
+                className="h-3.5 w-3.5 accent-blue"
+              />
+              {s}
+            </label>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 const DEFAULT_PAGE_SIZE = 10;
 
-const COLS = ['', 'SRT code', 'Description', 'Std hours', 'Confidence', 'Source', ''];
+const COLS = ['', 'SRT code', 'Description', 'Std (h)', 'Confidence', 'Source', ''];
 const th =
   'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left';
 const td = 'border-b border-line px-3.5 py-3 align-middle';
@@ -94,6 +164,9 @@ export function RecommendationsResult({
     () => new Set(items.filter((i) => i.selected).map((i) => i.srt_code)),
   );
   const [filter, setFilter] = useState('');
+  const [minConfidence, setMinConfidence] = useState(env.defaultMinConfidence);
+  const [minHours, setMinHours] = useState(env.defaultMinHours);
+  const [selectedSources, setSelectedSources] = useState(() => new Set());
   const [expanded, setExpanded] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
@@ -102,20 +175,70 @@ export function RecommendationsResult({
     setFilter(e.target.value);
     setOffset(0);
   };
+  const onMinConfidenceChange = (e) => {
+    const raw = Number(e.target.value);
+    setMinConfidence(Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0);
+    setOffset(0);
+  };
+  const onMinHoursChange = (e) => {
+    setMinHours(e.target.value);
+    setOffset(0);
+  };
+  const toggleSource = (source) => {
+    setSelectedSources((prev) => {
+      const next = new Set(prev);
+      if (next.has(source)) next.delete(source);
+      else next.add(source);
+      return next;
+    });
+    setOffset(0);
+  };
 
   const updateSelection = useUpdateSelection(recommendation.recommendation_id);
 
+  const sourceOptions = useMemo(() => {
+    const set = new Set();
+    items.forEach((i) => (i.sources ?? []).forEach((s) => set.add(s)));
+    return [...set].sort();
+  }, [items]);
+
+  const hasActiveFilters =
+    Boolean(filter) ||
+    minConfidence !== env.defaultMinConfidence ||
+    minHours !== env.defaultMinHours ||
+    selectedSources.size > 0;
+
+  const clearFilters = () => {
+    setFilter('');
+    setMinConfidence(env.defaultMinConfidence);
+    setMinHours(env.defaultMinHours);
+    setSelectedSources(new Set());
+    setOffset(0);
+  };
+
   const visible = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    const filtered = q
-      ? items.filter((i) =>
-          `${i.srt_code} ${i.description}`.toLowerCase().includes(q),
-        )
-      : items;
+    const minHoursNum = minHours === '' ? null : Number(minHours);
+    const filtered = items.filter((i) => {
+      if (q && !`${i.srt_code} ${i.description}`.toLowerCase().includes(q)) {
+        return false;
+      }
+      if (confidencePct(i) < minConfidence) return false;
+      if (
+        selectedSources.size > 0 &&
+        !(i.sources ?? []).some((s) => selectedSources.has(s))
+      ) {
+        return false;
+      }
+      if (minHoursNum != null && minHoursNum > 0) {
+        if (i.hours == null || Number(i.hours) < minHoursNum) return false;
+      }
+      return true;
+    });
     return [...filtered].sort(
       (a, b) => (b.confidence_score ?? 0) - (a.confidence_score ?? 0),
     );
-  }, [items, filter]);
+  }, [items, filter, minConfidence, minHours, selectedSources]);
 
   const paged = useMemo(
     () => visible.slice(offset, offset + pageSize),
@@ -181,21 +304,71 @@ export function RecommendationsResult({
         </div>
       ) : (
         <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-5.5 py-3">
-            <span className="font-display text-[13.5px] font-bold text-navy">
-              {items.length} recommended {items.length === 1 ? 'code' : 'codes'}
-            </span>
+          <div className="flex shrink-0 flex-wrap items-center gap-2.5 border-b border-line px-5.5 py-2.5">
             <div className="relative">
-              <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-3" />
-              <Input
+              <SearchIcon className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-3" />
+              <input
                 type="search"
                 value={filter}
                 onChange={onFilterChange}
                 placeholder="Filter by code or description"
                 aria-label="Filter recommendations"
-                className="w-64 pl-8"
+                className="w-56 rounded-sm border border-line-2 bg-surface py-1.5 pl-7 pr-2 text-[12.5px] text-ink focus:border-light-blue focus:outline-none focus:ring focus:ring-light-blue-soft"
               />
             </div>
+
+            <div className="flex items-center gap-1 rounded-sm border border-line-2 bg-surface px-2 py-1.5 focus-within:border-light-blue focus-within:ring focus-within:ring-light-blue-soft">
+              <span className="font-display text-[9px] font-bold uppercase tracking-[0.07em] text-ink-3">
+                Min confidence
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={5}
+                value={minConfidence}
+                onChange={onMinConfidenceChange}
+                aria-label="Minimum confidence percent"
+                className="w-8 border-0 bg-transparent p-0 text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              />
+              <span className="text-[11px] text-ink-3">%</span>
+            </div>
+
+            <div className="flex items-center gap-1 rounded-sm border border-line-2 bg-surface px-2 py-1.5 focus-within:border-light-blue focus-within:ring focus-within:ring-light-blue-soft">
+              <span className="font-display text-[9px] font-bold uppercase tracking-[0.07em] text-ink-3">
+                Min hours
+              </span>
+              <input
+                type="number"
+                min={0}
+                step={0.1}
+                value={minHours}
+                onChange={onMinHoursChange}
+                placeholder="0.0"
+                aria-label="Minimum standard hours"
+                className="w-10 border-0 bg-transparent p-0 text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              />
+              <span className="text-[11px] text-ink-3">hrs</span>
+            </div>
+
+            {sourceOptions.length > 0 ? (
+              <SourceMultiSelect
+                options={sourceOptions}
+                selected={selectedSources}
+                onToggle={toggleSource}
+              />
+            ) : null}
+
+            {hasActiveFilters ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="ml-auto"
+              >
+                Clear filters
+              </Button>
+            ) : null}
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto">

@@ -43,6 +43,11 @@ const env = {
     .split(',')
     .map((role) => role.trim())
     .filter(Boolean),
+
+  /** Default "Min confidence" filter (%) on the recommendations screen. */
+  defaultMinConfidence: Number(import.meta.env.VITE_DEFAULT_MIN_CONFIDENCE) || 0,
+  /** Default "Min hours" filter on the recommendations screen. Empty = no filter. */
+  defaultMinHours: import.meta.env.VITE_DEFAULT_MIN_HOURS ?? '',
 };
 
 export default env;
