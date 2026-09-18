@@ -1,15 +1,15 @@
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { ROLES, roleLabel } from '@/features/auth/roles';
-import { formatDate } from '@/lib/format';
-import { getErrorMessage } from '@/lib/apiError';
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { ROLES, roleLabel } from "@/features/auth/roles";
+import { formatDate } from "@/lib/format";
+import { getErrorMessage } from "@/lib/apiError";
 
 const COLUMNS = [
-  { key: 'name', label: 'Name' },
-  { key: 'username', label: 'Username' },
-  { key: 'roles', label: 'Roles' },
-  { key: 'since', label: 'Member since' },
-  { key: 'lastActive', label: 'Last active' },
+  { key: "name", label: "Name" },
+  { key: "username", label: "Username" },
+  { key: "roles", label: "Roles" },
+  { key: "since", label: "Member since" },
+  { key: "lastActive", label: "Last active" },
 ];
 
 function RoleBadges({ roles = [] }) {
@@ -17,7 +17,7 @@ function RoleBadges({ roles = [] }) {
   return (
     <span className="flex flex-wrap gap-1.5">
       {roles.map((r) => (
-        <Badge key={r} tone={r === ROLES.ADMIN ? 'navy' : 'neutral'}>
+        <Badge key={r} tone={r === ROLES.ADMIN ? "navy" : "neutral"}>
           {roleLabel(r)}
         </Badge>
       ))}
@@ -38,7 +38,7 @@ function StateRow({ children }) {
   );
 }
 
-const cell = 'border-b border-line px-3.5 py-3';
+const cell = "border-b border-line px-3.5 py-3";
 const numCell = `${cell} tabular-nums text-ink-3`;
 
 export function UsersTable({
@@ -55,7 +55,7 @@ export function UsersTable({
   return (
     <div
       className={`h-full overflow-auto rounded-md border border-line bg-surface transition-opacity ${
-        dimmed ? 'opacity-60' : ''
+        dimmed ? "opacity-60" : ""
       }`}
     >
       <table className="w-full border-collapse text-[13px]">
@@ -65,7 +65,7 @@ export function UsersTable({
               <th
                 key={c.key}
                 className={`border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy ${
-                  c.align === 'right' ? 'text-right' : 'text-left'
+                  c.align === "right" ? "text-right" : "text-left"
                 }`}
               >
                 {c.label}
@@ -82,7 +82,7 @@ export function UsersTable({
                 <span>
                   {error?.status === 403
                     ? "You don't have access to user management."
-                    : getErrorMessage(error, 'Could not load users.')}
+                    : getErrorMessage(error, "Could not load users.")}
                 </span>
                 {error?.status !== 403 && onRetry ? (
                   <Button variant="secondary" onClick={onRetry}>

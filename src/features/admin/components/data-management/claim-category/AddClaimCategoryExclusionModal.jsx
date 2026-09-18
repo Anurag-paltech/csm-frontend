@@ -66,6 +66,7 @@ export function AddClaimCategoryExclusionModal({ open, onClose }) {
         >
           <Input
             id="claim_category"
+            maxLength={50}
             invalid={Boolean(errors.claim_category)}
             {...register('claim_category')}
           />

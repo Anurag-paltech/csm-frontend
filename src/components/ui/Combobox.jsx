@@ -37,6 +37,7 @@ export function Combobox({
   disabled = false,
   onFocus,
   onBlur,
+  footer,
 }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -143,6 +144,11 @@ export function Combobox({
               </li>
             ))
           )}
+          {footer && options.length > 0 ? (
+            <li className="cursor-default select-none border-t border-line px-2.5 py-1.5 text-[11px] text-ink-3">
+              {footer}
+            </li>
+          ) : null}
         </ul>
       ) : null}
     </div>

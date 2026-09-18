@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/Button';
-import { getErrorMessage } from '@/lib/apiError';
+import { Button } from "@/components/ui/Button";
+import { getErrorMessage } from "@/lib/apiError";
 
-const COLS = ['Obsolete SRT', 'Replacement SRT', 'Reason'];
+const COLS = ["Obsolete SRT", "Replacement SRT", "Reason"];
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 const codeCell = `${td} whitespace-nowrap font-display font-bold text-navy`;
 
 function StateRow({ children }) {
@@ -35,7 +35,7 @@ export function SrtCrossRefTable({
   return (
     <div
       className={`h-full overflow-auto rounded-md border border-line bg-surface transition-opacity ${
-        dimmed ? 'opacity-60' : ''
+        dimmed ? "opacity-60" : ""
       }`}
     >
       <table className="w-full min-w-125 border-collapse text-sm">
@@ -54,7 +54,9 @@ export function SrtCrossRefTable({
           ) : isError ? (
             <StateRow>
               <div className="flex flex-col items-center gap-2">
-                <span>{getErrorMessage(error, 'Could not load SRT code changes.')}</span>
+                <span>
+                  {getErrorMessage(error, "Could not load SRT code changes.")}
+                </span>
                 {onRetry ? (
                   <Button variant="secondary" onClick={onRetry}>
                     Retry
@@ -71,10 +73,13 @@ export function SrtCrossRefTable({
             </StateRow>
           ) : (
             rows.map((r, i) => (
-              <tr key={`${r.prev_srt}-${r.new_srt}-${i}`} className="hover:bg-surface-2">
+              <tr
+                key={`${r.prev_srt}-${r.new_srt}-${i}`}
+                className="hover:bg-surface-2"
+              >
                 <td className={codeCell}>{r.prev_srt}</td>
                 <td className={codeCell}>{r.new_srt}</td>
-                <td className={td}>{r.reason || '—'}</td>
+                <td className={td}>{r.reason || "—"}</td>
               </tr>
             ))
           )}

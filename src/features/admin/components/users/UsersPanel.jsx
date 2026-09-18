@@ -1,39 +1,39 @@
-import { useState } from 'react';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { ROLE_LABELS } from '@/features/auth/roles';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useUsers } from '@/features/admin/hooks/useUsers';
-import { UsersTable } from '@/features/admin/components/UsersTable';
-import { Pager } from '@/components/ui/Pager';
+import { useState } from "react";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { ROLE_LABELS } from "@/features/auth/roles";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useUsers } from "@/features/admin/hooks/useUsers";
+import { UsersTable } from "@/features/admin/components/users/UsersTable";
+import { Pager } from "@/components/ui/Pager";
 
-// `q` is an optional filter on a browsable table, so 1 char is treated as
-// "no filter" rather than gating the whole list.
 const MIN_SEARCH_CHARS = 2;
 const SEARCH_DEBOUNCE_MS = 350;
 const DEFAULT_PAGE_SIZE = 10;
 
 function SearchIcon(props) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      {...props}
+    >
       <circle cx="11" cy="11" r="7" />
       <path d="M20 20l-3.5-3.5" />
     </svg>
   );
 }
 
-/**
- * Admin → Users. Fills its container as a flex column: fixed toolbar, a table
- * that scrolls internally, fixed pager.
- */
 export function UsersPanel() {
-  const [role, setRole] = useState('');
-  const [search, setSearch] = useState('');
+  const [role, setRole] = useState("");
+  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
 
   const debouncedSearch = useDebouncedValue(search.trim(), SEARCH_DEBOUNCE_MS);
-  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : '';
+  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : "";
 
   const { data, isLoading, isError, error, isFetching, refetch } = useUsers({
     limit: pageSize,
@@ -42,7 +42,6 @@ export function UsersPanel() {
     q: q || undefined,
   });
 
-  // Any filter change goes back to the first page.
   const onSearchChange = (e) => {
     setSearch(e.target.value);
     setOffset(0);
@@ -71,7 +70,11 @@ export function UsersPanel() {
           />
         </div>
 
-        <Select value={role} onChange={onRoleChange} aria-label="Filter by role">
+        <Select
+          value={role}
+          onChange={onRoleChange}
+          aria-label="Filter by role"
+        >
           <option value="">All roles</option>
           {Object.entries(ROLE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>

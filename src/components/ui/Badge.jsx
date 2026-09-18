@@ -3,6 +3,7 @@ const tones = {
   navy: 'bg-navy-soft text-navy',
   blue: 'bg-light-blue-soft text-blue',
   green: 'bg-green-soft text-green',
+  red: 'bg-red-soft text-red',
 };
 
 /** Small pill label. Matches the mockup `.badge`. */

@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Pager } from '@/components/ui/Pager';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useSrtChanges } from '@/features/admin/hooks/useSrtCrossRef';
-import { SrtCrossRefTable } from '@/features/admin/components/SrtCrossRefTable';
-import { UploadSrtCrossRefModal } from '@/features/admin/components/UploadSrtCrossRefModal';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Pager } from "@/components/ui/Pager";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useSrtChanges } from "@/features/admin/hooks/useSrtCrossRef";
+import { SrtCrossRefTable } from "@/features/admin/components/data-management/cross-ref/SrtCrossRefTable";
+import { UploadSrtCrossRefModal } from "@/features/admin/components/data-management/cross-ref/UploadSrtCrossRefModal";
 
 const MIN_SEARCH_CHARS = 2;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -33,19 +33,20 @@ function SearchIcon(props) {
  * uploading a mapping file.
  */
 export function CrossRefPanel() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
   const [uploadOpen, setUploadOpen] = useState(false);
 
   const debouncedSearch = useDebouncedValue(search.trim(), SEARCH_DEBOUNCE_MS);
-  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : '';
+  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : "";
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useSrtChanges({
-    limit: pageSize,
-    offset,
-    q: q || undefined,
-  });
+  const { data, isLoading, isError, error, isFetching, refetch } =
+    useSrtChanges({
+      limit: pageSize,
+      offset,
+      q: q || undefined,
+    });
 
   const onSearchChange = (e) => {
     setSearch(e.target.value);

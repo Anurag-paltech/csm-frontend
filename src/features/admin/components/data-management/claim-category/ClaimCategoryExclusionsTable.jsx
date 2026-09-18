@@ -1,11 +1,11 @@
-import { Button } from '@/components/ui/Button';
-import { formatDateTime } from '@/lib/format';
-import { getErrorMessage } from '@/lib/apiError';
+import { Button } from "@/components/ui/Button";
+import { formatDateTime } from "@/lib/format";
+import { getErrorMessage } from "@/lib/apiError";
 
-const COLS = ['Claim category', 'Excluded since', ''];
+const COLS = ["Claim category", "Excluded since", ""];
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 const codeCell = `${td} whitespace-nowrap font-display font-bold text-navy`;
 
 function StateRow({ children }) {
@@ -37,7 +37,7 @@ export function ClaimCategoryExclusionsTable({
   return (
     <div
       className={`h-full overflow-auto rounded-md border border-line bg-surface transition-opacity ${
-        dimmed ? 'opacity-60' : ''
+        dimmed ? "opacity-60" : ""
       }`}
     >
       <table className="w-full min-w-125 border-collapse text-sm">
@@ -56,7 +56,9 @@ export function ClaimCategoryExclusionsTable({
           ) : isError ? (
             <StateRow>
               <div className="flex flex-col items-center gap-2">
-                <span>{getErrorMessage(error, 'Could not load exclusions.')}</span>
+                <span>
+                  {getErrorMessage(error, "Could not load exclusions.")}
+                </span>
                 {onRetry ? (
                   <Button variant="secondary" onClick={onRetry}>
                     Retry
@@ -77,7 +79,9 @@ export function ClaimCategoryExclusionsTable({
             rows.map((c) => (
               <tr key={c.claim_category} className="hover:bg-surface-2">
                 <td className={codeCell}>{c.claim_category}</td>
-                <td className={`${td} whitespace-nowrap tabular-nums text-ink-3`}>
+                <td
+                  className={`${td} whitespace-nowrap tabular-nums text-ink-3`}
+                >
                   {formatDateTime(c.updated_at)}
                 </td>
                 <td className={`${td} text-right`}>
@@ -87,7 +91,7 @@ export function ClaimCategoryExclusionsTable({
                     disabled={removingCode === c.claim_category}
                     className="rounded-sm px-2 py-1 font-display text-xs font-bold text-ink-3 hover:bg-red-soft hover:text-red disabled:opacity-40"
                   >
-                    {removingCode === c.claim_category ? 'Removing…' : 'Remove'}
+                    {removingCode === c.claim_category ? "Removing…" : "Remove"}
                   </button>
                 </td>
               </tr>

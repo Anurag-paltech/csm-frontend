@@ -65,6 +65,7 @@ export function AddExclusionModal({ open, onClose }) {
         >
           <Input
             id="campaign_code"
+            maxLength={100}
             invalid={Boolean(errors.campaign_code)}
             {...register('campaign_code')}
           />

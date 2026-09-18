@@ -27,10 +27,7 @@ export function useCreateRecommendation() {
   });
 }
 
-/**
- * PATCH the selection for `id`. `mutateAsync(selectedSrtCodes)` → the updated
- * recommendation, written into the detail cache; history is invalidated.
- */
+/** PATCH the selection for `id`. `mutateAsync(selectedSrtCodes)` */
 export function useUpdateSelection(id) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -43,7 +40,7 @@ export function useUpdateSelection(id) {
   });
 }
 
-/** GET a recommendation by id (`GET /srt/recommendations/${id}`) */
+/** GET complete recommendation by id */
 export function useRecommendation(id, options = {}) {
   return useQuery({
     queryKey: recommendationKeys.detail(id),
@@ -53,12 +50,7 @@ export function useRecommendation(id, options = {}) {
   });
 }
 
-/** Paged recommendation history (`GET /srt/recommendations`)
- * param {{
-      limit?: number, offset?: number, q?: string, status?: string
-      created_after?: string, created_before?: string }}
- * dates are `YYYY-MM-DD`, both inclusive; either may be sent alone.
- */
+/** GET paged recommendation history */
 export function useRecommendationHistory(params, options = {}) {
   return useQuery({
     queryKey: historyKeys.list(params),

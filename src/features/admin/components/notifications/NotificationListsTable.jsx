@@ -1,11 +1,10 @@
-import { Button } from '@/components/ui/Button';
-import { formatDateTime } from '@/lib/format';
-import { getErrorMessage } from '@/lib/apiError';
+import { Button } from "@/components/ui/Button";
+import { getErrorMessage } from "@/lib/apiError";
 
-const COLS = ['Campaign code', 'Excluded since', ''];
+const COLS = ["Title", "Recipients", ""];
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 const codeCell = `${td} whitespace-nowrap font-display font-bold text-navy`;
 
 function StateRow({ children }) {
@@ -21,15 +20,14 @@ function StateRow({ children }) {
   );
 }
 
-export function CampaignExclusionsTable({
+export function NotificationListsTable({
   page,
   isLoading,
   isError,
   error,
   onRetry,
   isFetching,
-  onRemove,
-  removingCode,
+  onEdit,
 }) {
   const rows = page?.items ?? [];
   const dimmed = isFetching && !isLoading;
@@ -37,10 +35,10 @@ export function CampaignExclusionsTable({
   return (
     <div
       className={`h-full overflow-auto rounded-md border border-line bg-surface transition-opacity ${
-        dimmed ? 'opacity-60' : ''
+        dimmed ? "opacity-60" : ""
       }`}
     >
-      <table className="w-full min-w-125 border-collapse text-sm">
+      <table className="w-full min-w-150 border-collapse text-sm">
         <thead>
           <tr>
             {COLS.map((c, i) => (
@@ -52,11 +50,13 @@ export function CampaignExclusionsTable({
         </thead>
         <tbody className="[&>tr:last-child>td]:border-b-0">
           {isLoading ? (
-            <StateRow>Loading exclusions…</StateRow>
+            <StateRow>Loading notification lists…</StateRow>
           ) : isError ? (
             <StateRow>
               <div className="flex flex-col items-center gap-2">
-                <span>{getErrorMessage(error, 'Could not load exclusions.')}</span>
+                <span>
+                  {getErrorMessage(error, "Could not load notification lists.")}
+                </span>
                 {onRetry ? (
                   <Button variant="secondary" onClick={onRetry}>
                     Retry
@@ -67,27 +67,26 @@ export function CampaignExclusionsTable({
           ) : rows.length === 0 ? (
             <StateRow>
               <span className="font-display font-bold text-navy">
-                No exclusions
+                No notification lists match
               </span>
-              <div className="mt-1">
-                No campaigns are currently excluded from recommendations.
-              </div>
+              <div className="mt-1">Try adjusting the search.</div>
             </StateRow>
           ) : (
-            rows.map((c) => (
-              <tr key={c.campaign_code} className="hover:bg-surface-2">
-                <td className={codeCell}>{c.campaign_code}</td>
-                <td className={`${td} whitespace-nowrap tabular-nums text-ink-3`}>
-                  {formatDateTime(c.updated_at)}
+            rows.map((l) => (
+              <tr key={l.id} className="hover:bg-surface-2">
+                <td className={codeCell}>{l.title}</td>
+                <td className={td}>
+                  <span className="line-clamp-2 text-ink-2">
+                    {l.emails?.join(", ") || "—"}
+                  </span>
                 </td>
                 <td className={`${td} text-right`}>
                   <button
                     type="button"
-                    onClick={() => onRemove(c)}
-                    disabled={removingCode === c.campaign_code}
-                    className="rounded-sm px-2 py-1 font-display text-xs font-bold text-ink-3 hover:bg-red-soft hover:text-red disabled:opacity-40"
+                    onClick={() => onEdit(l)}
+                    className="rounded-sm px-2 py-1 font-display text-xs font-bold text-ink-3 hover:bg-blue-soft hover:text-blue"
                   >
-                    {removingCode === c.campaign_code ? 'Removing…' : 'Remove'}
+                    Edit
                   </button>
                 </td>
               </tr>

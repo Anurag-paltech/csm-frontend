@@ -4,7 +4,6 @@ export { HistoryPage } from "./pages/HistoryPage";
 
 // =========================== Hooks ===================================
 export {
-  useClaimCategories,
   useTruckModels,
   useDealerCodes,
   useCausalParts,

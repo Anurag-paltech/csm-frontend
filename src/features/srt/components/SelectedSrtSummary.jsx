@@ -31,11 +31,6 @@ function TrashIcon(props) {
   );
 }
 
-/**
- * The confirmed SRT selection. Read-only except for per-row **Remove**, which
- * PATCHes the reduced set and hands the updated recommendation up via
- * `onSelectionChange`.
- */
 export function SelectedSrtSummary({
   items,
   totalHours,

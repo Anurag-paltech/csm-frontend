@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { FormField } from '@/components/ui/FormField';
-import { getErrorMessage } from '@/lib/apiError';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { FormField } from "@/components/ui/FormField";
+import { getErrorMessage } from "@/lib/apiError";
 import {
   dealerSchema,
   dealerDefaultValues,
   dealerToFormValues,
-} from '@/features/admin/schemas/dealerSchema';
+} from "@/features/admin/schemas/dealerSchema";
 import {
   useCreateDealer,
   useUpdateDealer,
-} from '@/features/admin/hooks/useDealers';
+} from "@/features/admin/hooks/useDealers";
 
 /**
  * Add/edit a dealer. Pass `dealer` to edit an existing row, or omit it to
@@ -60,12 +60,16 @@ export function DealerFormModal({ open, dealer, onClose }) {
       }
       close();
     } catch (err) {
-      setFormError(getErrorMessage(err, 'Could not save the dealer.'));
+      setFormError(getErrorMessage(err, "Could not save the dealer."));
     }
   };
 
   return (
-    <Modal open={open} onClose={close} title={isEdit ? 'Edit dealer' : 'Add dealer'}>
+    <Modal
+      open={open}
+      onClose={close}
+      title={isEdit ? "Edit dealer" : "Add dealer"}
+    >
       <form onSubmit={handleSubmit(submit)} noValidate>
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -73,67 +77,70 @@ export function DealerFormModal({ open, dealer, onClose }) {
             htmlFor="dealer_code"
             required
             error={errors.dealer_code?.message}
-            hint={isEdit ? "Can't be changed after creation" : undefined}
+            hint={isEdit ? "Can't be changed" : undefined}
           >
             <Input
               id="dealer_code"
+              maxLength={100}
               disabled={isEdit}
               invalid={Boolean(errors.dealer_code)}
-              {...register('dealer_code')}
+              {...register("dealer_code")}
             />
           </FormField>
 
           <FormField
             label="Dealer family code"
             htmlFor="dealer_family_code"
+            required
             error={errors.dealer_family_code?.message}
-            hint={isEdit ? "Can't be changed after creation" : undefined}
+            hint={isEdit ? "Can't be changed" : undefined}
           >
             <Input
               id="dealer_family_code"
+              maxLength={50}
               disabled={isEdit}
               invalid={Boolean(errors.dealer_family_code)}
-              {...register('dealer_family_code')}
+              {...register("dealer_family_code")}
             />
           </FormField>
 
           <FormField
             label="Branch"
             htmlFor="branch"
-            required
             error={errors.branch?.message}
           >
             <Input
               id="branch"
+              maxLength={50}
               invalid={Boolean(errors.branch)}
-              {...register('branch')}
+              {...register("branch")}
             />
           </FormField>
 
           <FormField
             label="Branch code"
             htmlFor="branch_code"
-            required
             error={errors.branch_code?.message}
           >
             <Input
               id="branch_code"
+              maxLength={10}
               invalid={Boolean(errors.branch_code)}
-              {...register('branch_code')}
+              {...register("branch_code")}
             />
           </FormField>
 
           <FormField
             label="Region"
             htmlFor="region"
-            required
             className="col-span-full"
             error={errors.region?.message}
           >
             <Input
               id="region"
+              maxLength={50}
               invalid={Boolean(errors.region)}
-              {...register('region')}
+              {...register("region")}
             />
           </FormField>
         </div>
@@ -143,11 +150,16 @@ export function DealerFormModal({ open, dealer, onClose }) {
         ) : null}
 
         <div className="mt-5 flex items-center justify-end gap-2.5">
-          <Button type="button" variant="ghost" onClick={close} disabled={isPending}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={close}
+            disabled={isPending}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={isPending}>
-            {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add dealer'}
+            {isPending ? "Saving…" : isEdit ? "Save changes" : "Add dealer"}
           </Button>
         </div>
       </form>

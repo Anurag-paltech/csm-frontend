@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/Button";
@@ -6,12 +6,12 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Combobox } from "@/components/ui/Combobox";
+import { Select } from "@/components/ui/Select";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { FormField } from "@/components/ui/FormField";
 import { getErrorMessage } from "@/lib/apiError";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import {
-  useClaimCategories,
   useTruckModels,
   useDealerCodes,
   useCausalParts,
@@ -30,6 +30,7 @@ import {
 } from "@/features/srt/schemas/querySchema";
 
 const FIELD_NAMES = new Set(Object.keys(queryDefaultValues));
+const EMPTY_LIST = [];
 const VIN_DIVISIONS = { K: "Kenworth", P: "Peterbilt" };
 const ArrowRight = (props) => (
   <svg
@@ -56,9 +57,12 @@ function vinDivision(vin) {
   return { char, make: VIN_DIVISIONS[char] ?? "Unknown" };
 }
 
-function DerivedChip({ children }) {
+function DerivedChip({ children, title, className = "" }) {
   return (
-    <span className="rounded-sm border border-blue-border bg-blue-soft px-2 py-0.75 text-[11px] text-blue">
+    <span
+      title={title}
+      className={`rounded-sm border border-blue-border bg-blue-soft px-2 py-0.75 text-[11px] text-blue ${className}`}
+    >
       {children}
     </span>
   );
@@ -80,11 +84,6 @@ function applyServerFieldErrors(err, setError) {
   return applied;
 }
 
-/**
- * The SRT Recommendation query form. Owns the `POST /srt/recommendations`
- * mutation; on success calls `onSuccess(recommendation)`. `initialValues`
- * pre-fills it (used by "Edit query" from History).
- */
 export function QueryForm({ onSuccess, initialValues = null }) {
   const {
     register,
@@ -113,12 +112,19 @@ export function QueryForm({ onSuccess, initialValues = null }) {
 
   // Claim Category
   const category = watch("claim_category");
-  const claimCategories = useClaimCategories();
-  const categoryOptions = (claimCategories.data ?? []).map((value) => ({
+  const categoryOptions = Object.values(CLAIM_CATEGORY).map((value) => ({
     value,
     label: categoryLabel(value),
   }));
   const isEngine = category === CLAIM_CATEGORY.ENGINE;
+  const onCategoryChange = (value) => {
+    // Switching back to Truck drops any engine input.
+    if (value !== CLAIM_CATEGORY.ENGINE) {
+      setValue("engine_make", "");
+      setValue("engine_model", "");
+      clearErrors(["engine_make", "engine_model"]);
+    }
+  };
 
   // Truck Model
   const truckModels = useTruckModels(divisionFilter);
@@ -131,11 +137,11 @@ export function QueryForm({ onSuccess, initialValues = null }) {
   }, [divisionFilter, setValue, clearErrors]);
 
   // Engine Manufacturer
-  const engineMakes = useEngineMakes();
+  const engineMakes = useEngineMakes({ enabled: isEngine });
   const engineMake = watch("engine_make");
 
   // Engine Model
-  const engineModels = useEngineModels(engineMake, divisionFilter);
+  const engineModels = useEngineModels(divisionFilter, { enabled: isEngine });
   useEffect(() => {
     if (isEngine && !engineMake && engineMakes.data?.length) {
       setValue("engine_make", engineMakes.data[0].value);
@@ -151,33 +157,34 @@ export function QueryForm({ onSuccess, initialValues = null }) {
   );
   const debouncedPartQuery = useDebouncedValue(partQuery, 300);
   const causalParts = useCausalParts(debouncedPartQuery);
-  const partOptions = causalParts.data ?? [];
+  const causalPartItems = causalParts.data?.items ?? EMPTY_LIST;
+  const partOptions = useMemo(
+    () => [
+      ...causalPartItems,
+      { value: "Other", label: "Other", hint: "Other" },
+    ],
+    [causalPartItems],
+  );
+  const causalPartsFooter =
+    causalParts.data?.hasMore && causalPartItems.length > 0
+      ? `Showing ${causalPartItems.length} of ${causalParts.data.total} — keep typing to narrow it down`
+      : undefined;
 
   // Dealer Code
   const dealerCodes = useDealerCodes();
-
-  // Repair Order Number
 
   // Repair Story
   const story = watch("repair_story");
   const charCount = story.length;
   const overLimit = charCount > STORY_CHAR_LIMIT;
 
-  const onCategoryChange = (value) => {
-    // Switching back to Truck drops any engine input.
-    if (value !== CLAIM_CATEGORY.ENGINE) {
-      setValue("engine_make", "");
-      setValue("engine_model", "");
-      clearErrors(["engine_make", "engine_model"]);
-    }
-  };
-
   const submit = async (values) => {
     setFormError(null);
     try {
-      const payload = toRecommendationPayload(values, {
-        causalPartDescription: partDesc,
-        divisionCode: division?.char,
+      const payload = toRecommendationPayload({
+        ...values,
+        causal_part_description: partDesc,
+        division_code: division?.char,
       });
       const rec = await recommend.mutateAsync(payload);
       onSuccess(rec);
@@ -224,7 +231,7 @@ export function QueryForm({ onSuccess, initialValues = null }) {
                 <DerivedChip>
                   Chassis{" "}
                   <b className="font-bold">
-                    {vin.trim().slice(-6).toUpperCase()}
+                    {vin.trim().slice(-8).toUpperCase()}
                   </b>
                 </DerivedChip>
               ) : null}
@@ -236,29 +243,30 @@ export function QueryForm({ onSuccess, initialValues = null }) {
             htmlFor="claim_category"
             required
             error={errors.claim_category?.message}
-            hint={
-              claimCategories.isError
-                ? "Could not load claim categories"
-                : undefined
-            }
           >
             <Controller
               name="claim_category"
               control={control}
               render={({ field }) => (
-                <SearchableSelect
+                <Select
                   id="claim_category"
                   value={field.value}
-                  onChange={(v) => {
-                    field.onChange(v);
-                    onCategoryChange(v);
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onCategoryChange(e.target.value);
                   }}
-                  options={categoryOptions}
-                  loading={claimCategories.isLoading}
-                  disabled={claimCategories.isLoading}
-                  placeholder="Search or select a category"
-                  error={Boolean(errors.claim_category)}
-                />
+                  invalid={Boolean(errors.claim_category)}
+                  className="w-full"
+                >
+                  <option value="" disabled>
+                    Select a category
+                  </option>
+                  {categoryOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </Select>
               )}
             />
           </FormField>
@@ -356,12 +364,8 @@ export function QueryForm({ onSuccess, initialValues = null }) {
                       onChange={field.onChange}
                       options={engineModels.data ?? []}
                       loading={engineModels.isLoading}
-                      disabled={!engineMake || engineModels.isLoading}
-                      placeholder={
-                        !engineMake
-                          ? "Pick a manufacturer first"
-                          : "Search or select a model"
-                      }
+                      disabled={engineModels.isLoading}
+                      placeholder="Search or select a model"
                       error={Boolean(errors.engine_model)}
                     />
                   )}
@@ -400,11 +404,19 @@ export function QueryForm({ onSuccess, initialValues = null }) {
                   placeholder="Search part number or description"
                   emptyText="No matching parts"
                   error={Boolean(errors.causal_part_number)}
+                  footer={causalPartsFooter}
                 />
               )}
             />
             <div className="flex min-h-5 flex-wrap gap-1.5">
-              {partDesc ? <DerivedChip>{partDesc}</DerivedChip> : null}
+              {partDesc ? (
+                <DerivedChip
+                  title={partDesc}
+                  className="max-w-60 overflow-hidden text-ellipsis whitespace-nowrap"
+                >
+                  {partDesc}
+                </DerivedChip>
+              ) : null}
             </div>
           </FormField>
 

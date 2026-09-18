@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Pager } from '@/components/ui/Pager';
-import { getErrorMessage } from '@/lib/apiError';
-import env from '@/config/env';
-import { CLAIM_CATEGORY_LABELS } from '@/features/srt/schemas/querySchema';
-import { useUpdateSelection } from '@/features/srt/hooks/useSrtRecommendation';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Pager } from "@/components/ui/Pager";
+import { getErrorMessage } from "@/lib/apiError";
+import env from "@/config/env";
+import { CLAIM_CATEGORY_LABELS } from "@/features/srt/schemas/querySchema";
+import { useUpdateSelection } from "@/features/srt/hooks/useSrtRecommendation";
 
-const BAND_TONE = { high: 'green', medium: 'blue', low: 'neutral' };
-const BAND_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+const BAND_TONE = { high: "green", medium: "blue", low: "neutral" };
+const BAND_LABEL = { high: "High", medium: "Medium", low: "Low" };
 
 const hoursOf = (item) => Number(item.hours) || 0;
 const confidencePct = (item) => Math.round((item.confidence_score ?? 0) * 100);
@@ -17,20 +17,31 @@ const bandKey = (item) => item.confidence_band?.toLowerCase();
 
 function SearchIcon(props) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      {...props}
+    >
       <circle cx="11" cy="11" r="7" />
       <path d="M20 20l-3.5-3.5" />
     </svg>
   );
 }
 
-function Chip({ k, children }) {
+function Chip({ k, children, title }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] shadow-card">
       <span className="font-display text-[9.5px] font-bold uppercase tracking-[0.09em] text-ink-3">
         {k}
       </span>
-      <b className="font-bold text-ink">{children}</b>
+      <b
+        className="max-w-60 overflow-hidden text-ellipsis whitespace-nowrap font-bold text-ink"
+        title={title ?? (typeof children === "string" ? children : undefined)}
+      >
+        {children}
+      </b>
     </span>
   );
 }
@@ -39,7 +50,7 @@ function QueryChips({ query, onEdit }) {
   if (!query) return null;
   const engine =
     query.engine_make || query.engine_model
-      ? `${query.engine_make ?? ''} ${query.engine_model ?? ''}`.trim()
+      ? `${query.engine_make ?? ""} ${query.engine_model ?? ""}`.trim()
       : null;
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -50,7 +61,10 @@ function QueryChips({ query, onEdit }) {
       {engine ? <Chip k="Engine">{engine}</Chip> : null}
       <Chip k="VIN">{query.vin}</Chip>
       <Chip k="Causal part">{query.causal_part_number}</Chip>
-      <Chip k="Dealer / RO">
+      <Chip
+        k="Dealer / RO"
+        title={`${query.dealer_code} · ${query.repair_order_number}`}
+      >
         {query.dealer_code} · {query.repair_order_number}
       </Chip>
       {onEdit ? (
@@ -64,13 +78,18 @@ function QueryChips({ query, onEdit }) {
 
 function ChevronIcon(props) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      {...props}
+    >
       <path d="M6 9l6 6 6-6" />
     </svg>
   );
 }
 
-/** Multi-select dropdown — a checklist popover, closes on outside click or Escape. */
 function SourceMultiSelect({ options, selected, onToggle }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -81,17 +100,17 @@ function SourceMultiSelect({ options, selected, onToggle }) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     };
     const onKeyDown = (e) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === "Escape") setOpen(false);
     };
-    document.addEventListener('mousedown', onClickOutside);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('mousedown', onClickOutside);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
-  const label = selected.size === 0 ? 'Source' : `Source (${selected.size})`;
+  const label = selected.size === 0 ? "Source" : `Source (${selected.size})`;
 
   return (
     <div className="relative" ref={ref}>
@@ -101,13 +120,13 @@ function SourceMultiSelect({ options, selected, onToggle }) {
         aria-expanded={open}
         className={`flex items-center gap-1 rounded-sm border px-2 py-1.5 text-[12.5px] transition-colors ${
           selected.size > 0
-            ? 'border-blue-border bg-blue-soft text-blue'
-            : 'border-line-2 bg-surface text-ink-2 hover:border-ink-3'
+            ? "border-blue-border bg-blue-soft text-blue"
+            : "border-line-2 bg-surface text-ink-2 hover:border-ink-3"
         }`}
       >
         {label}
         <ChevronIcon
-          className={`h-2.5 w-2.5 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-2.5 w-2.5 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
       {open ? (
@@ -134,36 +153,36 @@ function SourceMultiSelect({ options, selected, onToggle }) {
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const COLS = ['', 'SRT code', 'Description', 'Std (h)', 'Confidence', 'Source', ''];
+const COLS = [
+  "",
+  "SRT Code",
+  "Description",
+  "STD hours",
+  "Confidence",
+  "Source",
+  "",
+];
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 
-/**
- * Recommendations screen — filterable table with checkbox selection and an
- * expandable "why". "Continue with selected" PATCHes the selection, then hands
- * the updated recommendation up via `onContinue`.
- */
 export function RecommendationsResult({
   recommendation,
   onEditQuery,
   onBack,
-  backLabel = 'Back to query',
+  backLabel = "Back to query",
   onContinue,
 }) {
   const items = useMemo(
     () => recommendation.items ?? [],
     [recommendation.items],
   );
-  // Keyed off having no items rather than a specific `status` string, so this
-  // shows for any "nothing to review" response — the backend's exact status
-  // value for that case has changed before and may again.
   const noMatch = items.length === 0;
 
   const [selected, setSelected] = useState(
     () => new Set(items.filter((i) => i.selected).map((i) => i.srt_code)),
   );
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
   const [minConfidence, setMinConfidence] = useState(env.defaultMinConfidence);
   const [minHours, setMinHours] = useState(env.defaultMinHours);
   const [selectedSources, setSelectedSources] = useState(() => new Set());
@@ -177,7 +196,9 @@ export function RecommendationsResult({
   };
   const onMinConfidenceChange = (e) => {
     const raw = Number(e.target.value);
-    setMinConfidence(Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0);
+    setMinConfidence(
+      Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0,
+    );
     setOffset(0);
   };
   const onMinHoursChange = (e) => {
@@ -209,7 +230,7 @@ export function RecommendationsResult({
     selectedSources.size > 0;
 
   const clearFilters = () => {
-    setFilter('');
+    setFilter("");
     setMinConfidence(env.defaultMinConfidence);
     setMinHours(env.defaultMinHours);
     setSelectedSources(new Set());
@@ -218,7 +239,7 @@ export function RecommendationsResult({
 
   const visible = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    const minHoursNum = minHours === '' ? null : Number(minHours);
+    const minHoursNum = minHours === "" ? null : Number(minHours);
     const filtered = items.filter((i) => {
       if (q && !`${i.srt_code} ${i.description}`.toLowerCase().includes(q)) {
         return false;
@@ -269,7 +290,7 @@ export function RecommendationsResult({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       <QueryChips query={recommendation.query} onEdit={onEditQuery} />
 
       {noMatch ? (
@@ -290,7 +311,7 @@ export function RecommendationsResult({
             </p>
             <p className="text-[12.5px] text-ink-2">
               {recommendation.clarification_needed ||
-                'Add detail to the repair story or check the causal part, then resubmit.'}
+                "Add detail to the repair story or check the causal part, then resubmit."}
             </p>
           </div>
         </div>
@@ -304,7 +325,7 @@ export function RecommendationsResult({
         </div>
       ) : (
         <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex shrink-0 flex-wrap items-center gap-2.5 border-b border-line px-5.5 py-2.5">
+          <div className="flex shrink-0 flex-wrap items-center gap-2.5 border-b border-line px-5.5 py-1.75">
             <div className="relative">
               <SearchIcon className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-3" />
               <input
@@ -402,9 +423,7 @@ export function RecommendationsResult({
                         checked={selected.has(item.srt_code)}
                         onToggle={() => toggle(item.srt_code)}
                         open={isOpen}
-                        onWhy={() =>
-                          setExpanded(isOpen ? null : item.srt_code)
-                        }
+                        onWhy={() => setExpanded(isOpen ? null : item.srt_code)}
                       />
                     );
                   })
@@ -414,7 +433,7 @@ export function RecommendationsResult({
           </div>
 
           {visible.length > 0 ? (
-            <div className="shrink-0 border-t border-line px-5.5 py-2.5">
+            <div className="shrink-0 border-t border-line px-5.5 pb-2.5">
               <Pager
                 total={visible.length}
                 pageSize={pageSize}
@@ -432,11 +451,11 @@ export function RecommendationsResult({
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-line px-5.5 py-3">
             <span className="text-[13px] text-ink-2">
               {selected.size === 0 ? (
-                'No codes selected'
+                "No codes selected"
               ) : (
                 <>
-                  <b className="font-bold text-navy">{selected.size}</b> of{' '}
-                  {items.length} selected ·{' '}
+                  <b className="font-bold text-navy">{selected.size}</b> of{" "}
+                  {items.length} selected ·{" "}
                   <b className="font-bold text-navy">
                     {totalHours.toFixed(1)} hrs
                   </b>
@@ -448,7 +467,7 @@ export function RecommendationsResult({
                 <span className="text-[12px] font-bold text-red">
                   {getErrorMessage(
                     updateSelection.error,
-                    'Could not save selection.',
+                    "Could not save selection.",
                   )}
                 </span>
               ) : null}
@@ -460,8 +479,8 @@ export function RecommendationsResult({
                 disabled={selected.size === 0 || updateSelection.isPending}
               >
                 {updateSelection.isPending
-                  ? 'Saving…'
-                  : 'Continue with selected'}
+                  ? "Saving…"
+                  : "Continue with selected"}
               </Button>
             </div>
           </div>
@@ -484,23 +503,25 @@ function FragmentRow({ item, checked, onToggle, open, onWhy }) {
             className="h-4 w-4 accent-blue"
           />
         </td>
-        <td className={`${td} whitespace-nowrap font-display font-bold text-navy`}>
+        <td
+          className={`${td} whitespace-nowrap font-display font-bold text-navy`}
+        >
           {item.srt_code}
         </td>
         <td className={td}>{item.description}</td>
         <td className={`${td} whitespace-nowrap tabular-nums font-bold`}>
-          {item.hours == null ? '—' : `${hoursOf(item).toFixed(1)} hrs`}
+          {item.hours == null ? "—" : `${hoursOf(item).toFixed(1)} hrs`}
         </td>
         <td className={td}>
-          <Badge tone={BAND_TONE[bandKey(item)] ?? 'neutral'}>
+          <Badge tone={BAND_TONE[bandKey(item)] ?? "neutral"}>
             <span className="h-1.5 w-1.5 rounded-full bg-current" />
-            {BAND_LABEL[bandKey(item)] ?? item.confidence_band} ·{' '}
+            {BAND_LABEL[bandKey(item)] ?? item.confidence_band} ·{" "}
             {confidencePct(item)}%
           </Badge>
         </td>
         <td className={td}>
           <span className="whitespace-nowrap rounded-sm border border-line bg-surface-2 px-2 py-1 text-[11px] text-ink-2">
-            {(item.sources ?? []).join(', ') || '—'}
+            {(item.sources ?? []).join(", ") || "—"}
           </span>
         </td>
         <td className={`${td} text-right`}>
@@ -516,7 +537,7 @@ function FragmentRow({ item, checked, onToggle, open, onWhy }) {
               fill="none"
               stroke="currentColor"
               strokeWidth="2.6"
-              className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`}
+              className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
             >
               <path d="M6 9l6 6 6-6" />
             </svg>
@@ -532,7 +553,7 @@ function FragmentRow({ item, checked, onToggle, open, onWhy }) {
             <div className="font-display text-[10px] font-bold uppercase tracking-[0.09em] text-blue">
               Why this code
             </div>
-            <p className="mt-1 max-w-[900px] text-[13px] leading-[1.6] text-ink">
+            <p className="mt-1 max-w-225 text-[13px] leading-[1.6] text-ink">
               {item.explanation}
             </p>
           </td>

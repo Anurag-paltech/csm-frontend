@@ -21,7 +21,6 @@ async function getLookupPage(
 }
 
 export const lookupsApi = {
-  claimCategories: (opts) => getLookupPage("/lookups/claim-categories", opts),
   truckModels: ({ division, ...opts } = {}) =>
     getLookupPage("/lookups/truck-models", {
       ...opts,
@@ -35,6 +34,5 @@ export const lookupsApi = {
     }),
   causalParts: (opts) => getLookupPage("/lookups/causal-parts", opts),
   dealerCodes: (opts) => getLookupPage("/lookups/dealer-codes", opts),
-  /** `{ prev_srt, new_srt, reason }`, most recently changed first. */
   srtChanges: (opts) => getLookupPage("/lookups/srt-changes", opts),
 };

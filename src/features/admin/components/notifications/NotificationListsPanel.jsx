@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Pager } from '@/components/ui/Pager';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useDealers } from '@/features/admin/hooks/useDealers';
-import { DealerCodesTable } from '@/features/admin/components/DealerCodesTable';
-import { DealerFormModal } from '@/features/admin/components/DealerFormModal';
+import { useState } from "react";
+import { Input } from "@/components/ui/Input";
+import { Pager } from "@/components/ui/Pager";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useNotificationLists } from "@/features/admin/hooks/useNotificationLists";
+import { NotificationListsTable } from "@/features/admin/components/notifications/NotificationListsTable";
+import { NotificationListFormModal } from "@/features/admin/components/notifications/NotificationListFormModal";
 
 const MIN_SEARCH_CHARS = 2;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -28,24 +27,24 @@ function SearchIcon(props) {
 }
 
 /**
- * Admin → Data Management → Dealer. Add/edit dealer rows — no delete;
- * `dealer_code` and `dealer_family_code` are fixed once created (see
- * DealerFormModal).
+ * Admin → Data Management → Notifications. Edit-only — each row's recipient
+ * list can be changed, but titles are fixed and there's no create/delete.
  */
-export function DealerCodesPanel() {
-  const [search, setSearch] = useState('');
+export function NotificationListsPanel() {
+  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
-  const [formTarget, setFormTarget] = useState(null); // { dealer } | { dealer: null } | null
+  const [editing, setEditing] = useState(null);
 
   const debouncedSearch = useDebouncedValue(search.trim(), SEARCH_DEBOUNCE_MS);
-  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : '';
+  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : "";
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useDealers({
-    limit: pageSize,
-    offset,
-    q: q || undefined,
-  });
+  const { data, isLoading, isError, error, isFetching, refetch } =
+    useNotificationLists({
+      limit: pageSize,
+      offset,
+      q: q || undefined,
+    });
 
   const onSearchChange = (e) => {
     setSearch(e.target.value);
@@ -58,33 +57,29 @@ export function DealerCodesPanel() {
 
   return (
     <div className="flex h-full flex-col p-5.5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2.5">
+      <div className="mb-3 flex flex-wrap items-center gap-2.5">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-3" />
           <Input
             type="search"
             value={search}
             onChange={onSearchChange}
-            placeholder="Search dealers"
-            aria-label="Search dealers"
+            placeholder="Search notification lists"
+            aria-label="Search notification lists"
             className="w-64 pl-8"
           />
         </div>
-
-        <Button onClick={() => setFormTarget({ dealer: null })}>
-          Add dealer
-        </Button>
       </div>
 
       <div className="min-h-0 flex-1">
-        <DealerCodesTable
+        <NotificationListsTable
           page={data}
           isLoading={isLoading}
           isError={isError}
           error={error}
           onRetry={() => refetch()}
           isFetching={isFetching}
-          onEdit={(dealer) => setFormTarget({ dealer })}
+          onEdit={setEditing}
         />
       </div>
 
@@ -99,10 +94,10 @@ export function DealerCodesPanel() {
         />
       ) : null}
 
-      <DealerFormModal
-        open={formTarget !== null}
-        dealer={formTarget?.dealer ?? null}
-        onClose={() => setFormTarget(null)}
+      <NotificationListFormModal
+        open={editing !== null}
+        list={editing}
+        onClose={() => setEditing(null)}
       />
     </div>
   );

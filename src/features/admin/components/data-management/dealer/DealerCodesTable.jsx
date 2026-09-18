@@ -1,17 +1,17 @@
-import { Button } from '@/components/ui/Button';
-import { getErrorMessage } from '@/lib/apiError';
+import { Button } from "@/components/ui/Button";
+import { getErrorMessage } from "@/lib/apiError";
 
 const COLS = [
-  'Dealer code',
-  'Family code',
-  'Branch',
-  'Branch code',
-  'Region',
-  '',
+  "Dealer code",
+  "Family code",
+  "Branch",
+  "Branch code",
+  "Region",
+  "",
 ];
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-xs font-bold uppercase tracking-widest text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 const codeCell = `${td} whitespace-nowrap font-display font-bold text-navy`;
 
 function StateRow({ children }) {
@@ -42,7 +42,7 @@ export function DealerCodesTable({
   return (
     <div
       className={`h-full overflow-auto rounded-md border border-line bg-surface transition-opacity ${
-        dimmed ? 'opacity-60' : ''
+        dimmed ? "opacity-60" : ""
       }`}
     >
       <table className="w-full min-w-175 border-collapse text-sm">
@@ -61,7 +61,7 @@ export function DealerCodesTable({
           ) : isError ? (
             <StateRow>
               <div className="flex flex-col items-center gap-2">
-                <span>{getErrorMessage(error, 'Could not load dealers.')}</span>
+                <span>{getErrorMessage(error, "Could not load dealers.")}</span>
                 {onRetry ? (
                   <Button variant="secondary" onClick={onRetry}>
                     Retry
@@ -80,7 +80,7 @@ export function DealerCodesTable({
             rows.map((d) => (
               <tr key={d.dealer_id} className="hover:bg-surface-2">
                 <td className={codeCell}>{d.dealer_code}</td>
-                <td className={td}>{d.dealer_family_code || '—'}</td>
+                <td className={td}>{d.dealer_family_code || "—"}</td>
                 <td className={td}>{d.branch}</td>
                 <td className={td}>{d.branch_code}</td>
                 <td className={td}>{d.region}</td>

@@ -89,8 +89,6 @@ export function queryToFormValues(query) {
     engine_make: query.engine_make ?? "",
     engine_model: query.engine_model ?? "",
     causal_part_number: query.causal_part_number ?? "",
-    // Not an RHF-registered field — QueryForm reads this off `initialValues`
-    // directly to seed the causal-part description chip.
     causal_part_description: query.causal_part_description ?? "",
     dealer_code: query.dealer_code ?? "",
     repair_order_number: query.repair_order_number ?? "",
@@ -98,16 +96,7 @@ export function queryToFormValues(query) {
   };
 }
 
-/**
- * Shape the validated form values into the request body. `extra` carries
- * data the form derives but doesn't validate as a field in its own right —
- * the causal part's description (from the combobox's selected option) and
- * the division code (the VIN's 3rd character).
- */
-export function toRecommendationPayload(
-  values,
-  { causalPartDescription, divisionCode } = {},
-) {
+export function toRecommendationPayload(values) {
   const base = {
     vin: values.vin.trim().toUpperCase(),
     claim_category: values.claim_category,
@@ -121,7 +110,9 @@ export function toRecommendationPayload(
     base.engine_make = values.engine_make.trim();
     base.engine_model = values.engine_model.trim();
   }
-  if (causalPartDescription) base.causal_part_description = causalPartDescription;
-  if (divisionCode) base.division_code = divisionCode;
+  if (values.causal_part_description) {
+    base.causal_part_description = values.causal_part_description;
+  }
+  if (values.division_code) base.division_code = values.division_code;
   return base;
 }

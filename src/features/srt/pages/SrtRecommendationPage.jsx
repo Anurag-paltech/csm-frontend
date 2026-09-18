@@ -6,7 +6,7 @@
  * A past search opened from History (`?rec=<id>`) starts on the results
  * view; from there, "Edit query" seeds the form with its original query.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -51,9 +51,16 @@ export function SrtRecommendationPage() {
     enabled: recId !== null,
   });
 
+  const loadedRecIdRef = useRef(null);
   useEffect(() => {
     const data = openQuery.data;
-    if (recId && data && data.recommendation_id === recId) {
+    if (
+      recId &&
+      data &&
+      data.recommendation_id === recId &&
+      loadedRecIdRef.current !== recId
+    ) {
+      loadedRecIdRef.current = recId;
       setRecommendation(data);
       setView("results");
     }

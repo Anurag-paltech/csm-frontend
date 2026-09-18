@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
-import { UsersPanel } from '@/features/admin/components/UsersPanel';
-import { DataManagementPanel } from '@/features/admin/components/DataManagementPanel';
+import { UsersPanel } from '@/features/admin/components/users/UsersPanel';
+import { DataManagementPanel } from '@/features/admin/components/data-management/DataManagementPanel';
+import { JobManagementPanel } from '@/features/admin/components/jobs/JobManagementPanel';
+import { NotificationListsPanel } from '@/features/admin/components/notifications/NotificationListsPanel';
 
 const TABS = [
   { id: 'users', label: 'Users' },
@@ -11,25 +13,12 @@ const TABS = [
   { id: 'notifications', label: 'Notification Management' },
 ];
 
-function ComingSoon({ label }) {
-  return (
-    <div className="flex h-full items-center justify-center p-5.5">
-      <div className="rounded-lg border border-dashed border-line-2 bg-surface-2 px-8 py-10 text-center">
-        <p className="font-display text-[13.5px] font-bold text-navy">{label}</p>
-        <p className="mt-1 text-[13px] text-ink-3">This section isn’t built yet.</p>
-      </div>
-    </div>
-  );
-}
-
 /**
  * Admin console. Route is guarded by <RoleRoute roles={[ROLES.ADMIN]}>; the API
- * also 403s for non-admins. Only the Users tab is implemented; the rest are
- * placeholders.
+ * also 403s for non-admins.
  */
 export function AdminPage() {
   const [tab, setTab] = useState('users');
-  const activeLabel = (TABS.find((t) => t.id === tab) ?? TABS[0]).label;
 
   return (
     <div className="flex h-full flex-col">
@@ -59,8 +48,10 @@ export function AdminPage() {
             <UsersPanel />
           ) : tab === 'data' ? (
             <DataManagementPanel />
+          ) : tab === 'jobs' ? (
+            <JobManagementPanel />
           ) : (
-            <ComingSoon label={activeLabel} />
+            <NotificationListsPanel />
           )}
         </div>
       </Card>

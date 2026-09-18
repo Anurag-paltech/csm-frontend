@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/ui/Modal';
-import { getErrorMessage } from '@/lib/apiError';
-import { useUploadSrtCrossRef } from '@/features/admin/hooks/useSrtCrossRef';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { getErrorMessage } from "@/lib/apiError";
+import { useUploadSrtCrossRef } from "@/features/admin/hooks/useSrtCrossRef";
 
 const RESULT_ROWS = [
-  ['processed', 'Rows processed'],
-  ['updated', 'Updated'],
-  ['skipped_unchanged', 'Skipped (unchanged)'],
-  ['created_old_code_stubs', 'New old-code stubs'],
-  ['created_new_code_stubs', 'New new-code stubs'],
+  ["processed", "Rows processed"],
+  ["updated", "Updated"],
+  ["skipped_unchanged", "Skipped (unchanged)"],
+  ["created_old_code_stubs", "New old-code stubs"],
+  ["created_new_code_stubs", "New new-code stubs"],
 ];
 
 /**
@@ -40,8 +40,8 @@ export function UploadSrtCrossRefModal({ open, onClose }) {
     } catch (err) {
       setFormError(
         err?.status === 422
-          ? getErrorMessage(err, 'The file is missing a required column.')
-          : getErrorMessage(err, 'Could not upload the file.'),
+          ? getErrorMessage(err, "The file is missing a required column.")
+          : getErrorMessage(err, "Could not upload the file."),
       );
     }
   };
@@ -55,7 +55,7 @@ export function UploadSrtCrossRefModal({ open, onClose }) {
               <div key={key} className="contents">
                 <dt className="text-ink-3">{label}</dt>
                 <dd className="text-right font-bold text-navy tabular-nums">
-                  {result[key] ?? '—'}
+                  {result[key] ?? "—"}
                 </dd>
               </div>
             ))}
@@ -67,8 +67,8 @@ export function UploadSrtCrossRefModal({ open, onClose }) {
       ) : (
         <form onSubmit={submit}>
           <p className="mb-3 text-[13px] text-ink-2">
-            Excel file with columns <b className="font-bold">Old SRT Code</b>,{' '}
-            <b className="font-bold">New SRT Code</b>, and optional{' '}
+            Excel file with columns <b className="font-bold">Old SRT Code</b>,{" "}
+            <b className="font-bold">New SRT Code</b>, and optional{" "}
             <b className="font-bold">Reason</b>.
           </p>
           <input
@@ -92,7 +92,7 @@ export function UploadSrtCrossRefModal({ open, onClose }) {
               Cancel
             </Button>
             <Button type="submit" disabled={!file || upload.isPending}>
-              {upload.isPending ? 'Uploading…' : 'Upload'}
+              {upload.isPending ? "Uploading…" : "Upload"}
             </Button>
           </div>
         </form>

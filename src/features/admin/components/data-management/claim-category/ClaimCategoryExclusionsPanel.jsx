@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Pager } from '@/components/ui/Pager';
-import { getErrorMessage } from '@/lib/apiError';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useCampaigns, useUpdateCampaign } from '@/features/admin/hooks/useCampaigns';
-import { CampaignExclusionsTable } from '@/features/admin/components/CampaignExclusionsTable';
-import { AddExclusionModal } from '@/features/admin/components/AddExclusionModal';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Pager } from "@/components/ui/Pager";
+import { getErrorMessage } from "@/lib/apiError";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import {
+  useClaimCategoryExclusions,
+  useUpdateClaimCategoryExclusion,
+} from "@/features/admin/hooks/useClaimCategoryExclusions";
+import { ClaimCategoryExclusionsTable } from "@/features/admin/components/data-management/claim-category/ClaimCategoryExclusionsTable";
+import { AddClaimCategoryExclusionModal } from "@/features/admin/components/data-management/claim-category/AddClaimCategoryExclusionModal";
 
 const MIN_SEARCH_CHARS = 2;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -29,28 +32,31 @@ function SearchIcon(props) {
 }
 
 /**
- * Admin → Data Management → Campaign. Lists campaigns currently excluded
- * from recommendations (`use_for_rec: false`) — "Add exclusion" flips an
- * existing campaign's flag to false, "Remove" flips it back to true.
+ * Admin → Data Management → Claim Category. Lists claim categories currently
+ * excluded from recommendations (`use_for_rec: false`) — "Add exclusion"
+ * flips an existing category's flag to false, "Remove" flips it back to
+ * true. This is a distinct admin entity from the SRT query form's
+ * `claim_category` field (truck/engine) — same name, different thing.
  */
-export function CampaignExclusionsPanel() {
-  const [search, setSearch] = useState('');
+export function ClaimCategoryExclusionsPanel() {
+  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
   const [addOpen, setAddOpen] = useState(false);
   const [removeError, setRemoveError] = useState(null);
 
   const debouncedSearch = useDebouncedValue(search.trim(), SEARCH_DEBOUNCE_MS);
-  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : '';
+  const q = debouncedSearch.length >= MIN_SEARCH_CHARS ? debouncedSearch : "";
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useCampaigns({
-    limit: pageSize,
-    offset,
-    use_for_rec: false,
-    q: q || undefined,
-  });
+  const { data, isLoading, isError, error, isFetching, refetch } =
+    useClaimCategoryExclusions({
+      limit: pageSize,
+      offset,
+      use_for_rec: false,
+      q: q || undefined,
+    });
 
-  const updateCampaign = useUpdateCampaign();
+  const updateExclusion = useUpdateClaimCategoryExclusion();
 
   const onSearchChange = (e) => {
     setSearch(e.target.value);
@@ -61,15 +67,15 @@ export function CampaignExclusionsPanel() {
     setOffset(0);
   };
 
-  const removeExclusion = async (campaign) => {
+  const removeExclusion = async (claimCategory) => {
     setRemoveError(null);
     try {
-      await updateCampaign.mutateAsync({
-        campaignCode: campaign.campaign_code,
+      await updateExclusion.mutateAsync({
+        claimCategory: claimCategory.claim_category,
         useForRec: true,
       });
     } catch (err) {
-      setRemoveError(getErrorMessage(err, 'Could not remove the exclusion.'));
+      setRemoveError(getErrorMessage(err, "Could not remove the exclusion."));
     }
   };
 
@@ -82,8 +88,8 @@ export function CampaignExclusionsPanel() {
             type="search"
             value={search}
             onChange={onSearchChange}
-            placeholder="Search campaign code"
-            aria-label="Search excluded campaigns"
+            placeholder="Search claim category"
+            aria-label="Search excluded claim categories"
             className="w-64 pl-8"
           />
         </div>
@@ -96,7 +102,7 @@ export function CampaignExclusionsPanel() {
       ) : null}
 
       <div className="min-h-0 flex-1">
-        <CampaignExclusionsTable
+        <ClaimCategoryExclusionsTable
           page={data}
           isLoading={isLoading}
           isError={isError}
@@ -105,7 +111,9 @@ export function CampaignExclusionsPanel() {
           isFetching={isFetching}
           onRemove={removeExclusion}
           removingCode={
-            updateCampaign.isPending ? updateCampaign.variables?.campaignCode : null
+            updateExclusion.isPending
+              ? updateExclusion.variables?.claimCategory
+              : null
           }
         />
       </div>
@@ -121,7 +129,10 @@ export function CampaignExclusionsPanel() {
         />
       ) : null}
 
-      <AddExclusionModal open={addOpen} onClose={() => setAddOpen(false)} />
+      <AddClaimCategoryExclusionModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+      />
     </div>
   );
 }

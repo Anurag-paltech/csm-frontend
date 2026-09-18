@@ -1,29 +1,40 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const dealerSchema = z.object({
-  dealer_code: z.string().trim().min(1, 'Dealer code is required'),
-  dealer_family_code: z.string().trim(),
-  branch: z.string().trim().min(1, 'Branch is required'),
-  branch_code: z.string().trim().min(1, 'Branch code is required'),
-  region: z.string().trim().min(1, 'Region is required'),
+  dealer_code: z
+    .string()
+    .trim()
+    .min(1, "Dealer code is required")
+    .max(100, "Dealer code must be 100 characters or fewer"),
+  dealer_family_code: z
+    .string()
+    .trim()
+    .min(1, "Dealer family code is required")
+    .max(50, "Dealer family code must be 50 characters or fewer"),
+  branch: z.string().trim().max(50, "Branch must be 50 characters or fewer"),
+  branch_code: z
+    .string()
+    .trim()
+    .max(10, "Branch code must be 10 characters or fewer"),
+  region: z.string().trim().max(50, "Region must be 50 characters or fewer"),
 });
 
 export const dealerDefaultValues = {
-  dealer_code: '',
-  dealer_family_code: '',
-  branch: '',
-  branch_code: '',
-  region: '',
+  dealer_code: "",
+  dealer_family_code: "M450OG",
+  branch: "",
+  branch_code: "",
+  region: "",
 };
 
-/** Map a dealer row to form values (for editing an existing dealer). */
+/** Map a dealer row to form values */
 export function dealerToFormValues(dealer) {
   if (!dealer) return dealerDefaultValues;
   return {
-    dealer_code: dealer.dealer_code ?? '',
-    dealer_family_code: dealer.dealer_family_code ?? '',
-    branch: dealer.branch ?? '',
-    branch_code: dealer.branch_code ?? '',
-    region: dealer.region ?? '',
+    dealer_code: dealer.dealer_code ?? "",
+    dealer_family_code: dealer.dealer_family_code ?? "",
+    branch: dealer.branch ?? "",
+    branch_code: dealer.branch_code ?? "",
+    region: dealer.region ?? "",
   };
 }

@@ -3,17 +3,15 @@ import { lookupsApi } from "@/features/srt/api/lookupsApi";
 
 export const lookupKeys = {
   all: ["lookups"],
-  claimCategories: () => [...lookupKeys.all, "claim-categories"],
   truckModels: (division) => [
     ...lookupKeys.all,
     "truck-models",
     division ?? "",
   ],
   engineMakes: () => [...lookupKeys.all, "engine-makes"],
-  engineModels: (make, division) => [
+  engineModels: (division) => [
     ...lookupKeys.all,
     "engine-models",
-    make ?? "",
     division ?? "",
   ],
   causalParts: (q) => [...lookupKeys.all, "causal-parts", q],
@@ -21,15 +19,6 @@ export const lookupKeys = {
 };
 
 const HOUR = 60 * 60 * 1000;
-
-export function useClaimCategories() {
-  return useQuery({
-    queryKey: lookupKeys.claimCategories(),
-    queryFn: () => lookupsApi.claimCategories({ all: true }),
-    staleTime: HOUR,
-    select: (page) => page.items.map((i) => i.claim_category),
-  });
-}
 
 export function useTruckModels(division) {
   return useQuery({
@@ -41,24 +30,25 @@ export function useTruckModels(division) {
   });
 }
 
-export function useEngineMakes() {
+export function useEngineMakes(options = {}) {
   return useQuery({
     queryKey: lookupKeys.engineMakes(),
     queryFn: () => lookupsApi.engineMakes({ all: true }),
     staleTime: HOUR,
     select: (page) =>
       page.items.map((i) => ({ value: i.engine_make, label: i.engine_make })),
+    ...options,
   });
 }
 
-export function useEngineModels(make, division) {
+export function useEngineModels(division, options = {}) {
   return useQuery({
-    queryKey: lookupKeys.engineModels(make, division),
-    queryFn: () => lookupsApi.engineModels({ make, division, all: true }),
-    enabled: Boolean(make),
+    queryKey: lookupKeys.engineModels(division),
+    queryFn: () => lookupsApi.engineModels({ division, all: true }),
     staleTime: HOUR,
     select: (page) =>
       page.items.map((i) => ({ value: i.engine_model, label: i.engine_model })),
+    ...options,
   });
 }
 
@@ -69,12 +59,15 @@ export function useCausalParts(q, { limit = 50 } = {}) {
     queryFn: () => lookupsApi.causalParts({ q: query, limit }),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
-    select: (page) =>
-      page.items.map((i) => ({
+    select: (page) => ({
+      items: page.items.map((i) => ({
         value: i.causal_part_number,
         label: i.causal_part_number,
         hint: i.causal_part_description ?? null,
       })),
+      total: page.total,
+      hasMore: page.has_more,
+    }),
   });
 }
 

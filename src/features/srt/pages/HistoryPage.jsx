@@ -148,7 +148,7 @@ export function HistoryPage() {
             variant="ghost"
             onClick={clearFilters}
             disabled={!hasRawFilters}
-            className="cursor-pointer"
+            className="ml-auto cursor-pointer"
           >
             Clear
           </Button>
