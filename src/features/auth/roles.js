@@ -1,6 +1,6 @@
 export const ROLES = {
-  ADMIN: "Admin",
-  USER_BUSINESS: "user_business",
+  ADMIN: "admin",
+  USER_BUSINESS: "business_user",
 };
 
 export const ROLE_LABELS = {
