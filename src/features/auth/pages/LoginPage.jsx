@@ -23,7 +23,7 @@ function MicrosoftGlyph() {
 
 /**
  * Public sign-in gate. No credentials form — the button hands off to the BFF's
- * OAuth flow (`useAuth().login` → `/auth/login`). See AUTH.md.
+ * OAuth flow (`useAuth().login` → `/auth/login`). See docs/AUTH.md.
  */
 export function LoginPage() {
   const { status, isAuthenticated, login } = useAuth();

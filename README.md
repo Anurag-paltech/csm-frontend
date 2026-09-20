@@ -21,7 +21,7 @@ management.
 | HTTP client        | [Axios](https://axios-http.com) (shared instance)  |
 | Forms + validation | [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) |
 
-Language is **JavaScript (JSX)** — see [DEVELOPMENT.md](./DEVELOPMENT.md#language)
+Language is **JavaScript (JSX)** — see [DEVELOPMENT.md](./docs/DEVELOPMENT.md#language)
 for the rationale and the path to TypeScript if needed later.
 
 ## Prerequisites
@@ -42,11 +42,11 @@ cp .env.example .env   # then edit if your backend isn't on localhost:8000
 | --------------------- | ------- | --------------------------------------------------- |
 | `VITE_API_BASE_URL`   | `''`    | API base URL. Empty = root-relative (same origin as the app), which the BFF expects. |
 | `VITE_DEV_API_PROXY`  | `http://localhost:8000` | Backend origin the dev server proxies BFF routes to (`/auth`, `/me`, `/claims`, `/admin`, `/health`). |
-| `VITE_AUTH_BYPASS`    | _(unset)_ | Dev only — skip auth and run as a mock user. See [AUTH.md](./AUTH.md#development-bypass). |
+| `VITE_AUTH_BYPASS`    | _(unset)_ | Dev only — skip auth and run as a mock user. See [AUTH.md](./docs/AUTH.md#development-bypass). |
 
 The backend is a **BFF**: it runs the OAuth flow, holds tokens server-side, and
 the browser only gets cookies. The Vite dev server proxies backend routes so the
-app shares the backend's origin (needed for cookies) — see [AUTH.md](./AUTH.md).
+app shares the backend's origin (needed for cookies) — see [AUTH.md](./docs/AUTH.md).
 
 ## Common commands
 
@@ -69,11 +69,11 @@ src/
 └── routes/       # route path constants + route guards
 ```
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full picture.
+See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the full picture.
 
 ## Documentation
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — folder structure and layering
-- [AUTH.md](./AUTH.md) — BFF model, cookies, CSRF, 401 refresh/retry, role guards
-- [API.md](./API.md) — API client conventions and feature API structure
-- [DEVELOPMENT.md](./DEVELOPMENT.md) — conventions and how to add a feature
+- [ARCHITECTURE.md](./docs/ARCHITECTURE.md) — folder structure and layering
+- [AUTH.md](./docs/AUTH.md) — BFF model, cookies, CSRF, 401 refresh/retry, role guards
+- [API.md](./docs/API.md) — API client conventions and feature API structure
+- [DEVELOPMENT.md](./docs/DEVELOPMENT.md) — conventions and how to add a feature

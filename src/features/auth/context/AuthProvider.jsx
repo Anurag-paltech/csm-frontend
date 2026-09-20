@@ -23,7 +23,7 @@ const BYPASS_USER = {
  * (identity + roles + scopes) used to render the UI and guard routes.
  *
  * When `env.authBypass` is on, all network auth is skipped and the app runs as
- * BYPASS_USER. See AUTH.md → "Development bypass".
+ * BYPASS_USER. See docs/AUTH.md → "Development bypass".
  */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() =>
