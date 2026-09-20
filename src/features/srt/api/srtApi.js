@@ -7,7 +7,7 @@ export const srtApi = {
     return data;
   },
 
-  /** Update the selection */
+  /** PATCH Update the selection */
   async updateSelection(id, selectedSrtCodes) {
     const { data } = await apiClient.patch(
       `/srt/recommendations/${id}/selection`,

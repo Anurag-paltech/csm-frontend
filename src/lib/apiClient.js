@@ -36,17 +36,23 @@ const toRelativePath = (value) => (/^\/(?!\/)/.test(value) ? value : '/');
 
 /**
  * Send the browser to the in-app sign-in gate (`/login`), carrying the page the
- * user was trying to reach as `?return_to=`. Used by the 401 interceptor and by
- * logout. No-ops if we're already on `/login` (prevents a reload loop while the
- * gate itself resolves the session).
+ * user was trying to reach as `?return_to=`. Used by the 401 interceptor. No-ops
+ * if we're already on `/login` (prevents a reload loop while the gate itself
+ * resolves the session).
+ *
+ * Always tags the URL with `session_expired=1` — by the time this runs, `/me`
+ * has already 401'd and a refresh attempt has already failed, so `AuthProvider`
+ * can skip re-checking `/me` on the fresh page load this triggers instead of
+ * repeating a check whose answer we already know.
  */
 export function redirectToLogin(
   returnTo = window.location.pathname + window.location.search,
 ) {
   if (window.location.pathname === LOGIN_PATH) return;
   const safe = toRelativePath(returnTo);
-  const query = safe === '/' ? '' : `?return_to=${encodeURIComponent(safe)}`;
-  window.location.assign(`${LOGIN_PATH}${query}`);
+  const params = new URLSearchParams({ session_expired: '1' });
+  if (safe !== '/') params.set('return_to', safe);
+  window.location.assign(`${LOGIN_PATH}?${params}`);
 }
 
 /**

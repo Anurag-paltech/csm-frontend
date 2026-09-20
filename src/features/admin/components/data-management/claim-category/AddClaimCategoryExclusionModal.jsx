@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { FormField } from '@/components/ui/FormField';
-import { getErrorMessage } from '@/lib/apiError';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { FormField } from "@/components/ui/FormField";
+import { getErrorMessage } from "@/lib/apiError";
 import {
   addClaimCategoryExclusionSchema,
   addClaimCategoryExclusionDefaultValues,
-} from '@/features/admin/schemas/claimCategorySchema';
-import { useUpdateClaimCategoryExclusion } from '@/features/admin/hooks/useClaimCategoryExclusions';
+} from "@/features/admin/schemas/claimCategorySchema";
+import { useUpdateClaimCategoryExclusion } from "@/features/admin/hooks/useClaimCategoryExclusions";
 
 /**
  * Excludes an existing claim category from recommendations
@@ -49,8 +49,8 @@ export function AddClaimCategoryExclusionModal({ open, onClose }) {
     } catch (err) {
       setFormError(
         err?.status === 404
-          ? 'No claim category with that name exists.'
-          : getErrorMessage(err, 'Could not add the exclusion.'),
+          ? "No claim category with that name exists."
+          : getErrorMessage(err, "Could not add the exclusion."),
       );
     }
   };
@@ -68,7 +68,7 @@ export function AddClaimCategoryExclusionModal({ open, onClose }) {
             id="claim_category"
             maxLength={50}
             invalid={Boolean(errors.claim_category)}
-            {...register('claim_category')}
+            {...register("claim_category")}
           />
         </FormField>
 
@@ -86,7 +86,7 @@ export function AddClaimCategoryExclusionModal({ open, onClose }) {
             Cancel
           </Button>
           <Button type="submit" disabled={updateExclusion.isPending}>
-            {updateExclusion.isPending ? 'Adding…' : 'Add exclusion'}
+            {updateExclusion.isPending ? "Adding…" : "Add exclusion"}
           </Button>
         </div>
       </form>

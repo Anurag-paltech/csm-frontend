@@ -3,13 +3,13 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-} from '@tanstack/react-query';
-import { adminApi } from '@/features/admin/api/adminApi';
-import { lookupKeys } from '@/features/srt/hooks/useLookups';
-import { lookupsApi } from '@/features/srt/api/lookupsApi';
+} from "@tanstack/react-query";
+import { adminApi } from "@/features/admin/api/adminApi";
+import { lookupKeys } from "@/features/srt/hooks/useLookups";
+import { lookupsApi } from "@/features/srt/api/lookupsApi";
 
 export const dealerKeys = {
-  all: ['admin', 'dealers'],
+  all: ["admin", "dealers"],
   list: (params) => [...dealerKeys.all, params ?? {}],
 };
 

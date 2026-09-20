@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { FormField } from '@/components/ui/FormField';
-import { getErrorMessage } from '@/lib/apiError';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { FormField } from "@/components/ui/FormField";
+import { getErrorMessage } from "@/lib/apiError";
 import {
   addExclusionSchema,
   addExclusionDefaultValues,
-} from '@/features/admin/schemas/campaignSchema';
-import { useUpdateCampaign } from '@/features/admin/hooks/useCampaigns';
+} from "@/features/admin/schemas/campaignSchema";
+import { useUpdateCampaign } from "@/features/admin/hooks/useCampaigns";
 
 /**
  * Excludes an existing campaign from recommendations (`use_for_rec: false`).
@@ -48,8 +48,8 @@ export function AddExclusionModal({ open, onClose }) {
     } catch (err) {
       setFormError(
         err?.status === 404
-          ? 'No campaign with that code exists.'
-          : getErrorMessage(err, 'Could not add the exclusion.'),
+          ? "No campaign with that code exists."
+          : getErrorMessage(err, "Could not add the exclusion."),
       );
     }
   };
@@ -67,7 +67,7 @@ export function AddExclusionModal({ open, onClose }) {
             id="campaign_code"
             maxLength={100}
             invalid={Boolean(errors.campaign_code)}
-            {...register('campaign_code')}
+            {...register("campaign_code")}
           />
         </FormField>
 
@@ -85,7 +85,7 @@ export function AddExclusionModal({ open, onClose }) {
             Cancel
           </Button>
           <Button type="submit" disabled={updateCampaign.isPending}>
-            {updateCampaign.isPending ? 'Adding…' : 'Add exclusion'}
+            {updateCampaign.isPending ? "Adding…" : "Add exclusion"}
           </Button>
         </div>
       </form>

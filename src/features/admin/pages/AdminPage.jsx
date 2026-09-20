@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Card } from '@/components/ui/Card';
-import { UsersPanel } from '@/features/admin/components/users/UsersPanel';
-import { DataManagementPanel } from '@/features/admin/components/data-management/DataManagementPanel';
-import { JobManagementPanel } from '@/features/admin/components/jobs/JobManagementPanel';
-import { NotificationListsPanel } from '@/features/admin/components/notifications/NotificationListsPanel';
+import { useState } from "react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { UsersPanel } from "@/features/admin/components/users/UsersPanel";
+import { DataManagementPanel } from "@/features/admin/components/data-management/DataManagementPanel";
+import { JobManagementPanel } from "@/features/admin/components/jobs/JobManagementPanel";
+import { NotificationListsPanel } from "@/features/admin/components/notifications/NotificationListsPanel";
 
 const TABS = [
-  { id: 'users', label: 'Users' },
-  { id: 'data', label: 'Data Management' },
-  { id: 'jobs', label: 'Job Management' },
-  { id: 'notifications', label: 'Notification Management' },
+  { id: "users", label: "Users" },
+  { id: "data", label: "Data Management" },
+  { id: "jobs", label: "Job Management" },
+  { id: "notifications", label: "Notification Management" },
 ];
 
 /**
@@ -18,7 +18,7 @@ const TABS = [
  * also 403s for non-admins.
  */
 export function AdminPage() {
-  const [tab, setTab] = useState('users');
+  const [tab, setTab] = useState("users");
 
   return (
     <div className="flex h-full flex-col">
@@ -31,11 +31,11 @@ export function AdminPage() {
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              aria-current={t.id === tab ? 'page' : undefined}
+              aria-current={t.id === tab ? "page" : undefined}
               className={`-mb-px whitespace-nowrap border-b-[2.5px] px-4.75 py-3.25 font-display text-[13.5px] font-bold transition-colors ${
                 t.id === tab
-                  ? 'border-red text-navy'
-                  : 'border-transparent text-ink-3 hover:bg-surface-2 hover:text-navy'
+                  ? "border-red text-navy"
+                  : "border-transparent text-ink-3 hover:bg-surface-2 hover:text-navy"
               }`}
             >
               {t.label}
@@ -44,11 +44,11 @@ export function AdminPage() {
         </div>
 
         <div className="min-h-0 flex-1">
-          {tab === 'users' ? (
+          {tab === "users" ? (
             <UsersPanel />
-          ) : tab === 'data' ? (
+          ) : tab === "data" ? (
             <DataManagementPanel />
-          ) : tab === 'jobs' ? (
+          ) : tab === "jobs" ? (
             <JobManagementPanel />
           ) : (
             <NotificationListsPanel />

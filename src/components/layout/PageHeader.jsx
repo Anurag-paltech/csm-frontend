@@ -1,4 +1,4 @@
-/** Screen header. Matches the mockup `.page-head` / `.eyebrow` / `.page-title`. */
+/** Screen header. `.page-head` / `.eyebrow` / `.page-title`. */
 export function PageHeader({ eyebrow, title, description, actions }) {
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
@@ -15,7 +15,9 @@ export function PageHeader({ eyebrow, title, description, actions }) {
           <p className="mt-1 text-sm text-ink-3">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex items-center gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }

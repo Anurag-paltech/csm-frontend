@@ -1,11 +1,3 @@
-/**
- * Primary screen at route `/`. Renders one of three views — query form,
- * recommendations, or selected codes — swapping between them as state
- * rather than as separate routes.
- *
- * A past search opened from History (`?rec=<id>`) starts on the results
- * view; from there, "Edit query" seeds the form with its original query.
- */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout/PageHeader";

@@ -47,11 +47,10 @@ export function SyncLogsPanel() {
     }
   };
 
-  const { data, isLoading, isError, error, isFetching, refetch } =
-    useSyncLogs({
-      start_date: toCompactDate(dateFrom),
-      end_date: toCompactDate(dateTo),
-    });
+  const { data, isLoading, isError, error, isFetching, refetch } = useSyncLogs({
+    start_date: toCompactDate(dateFrom),
+    end_date: toCompactDate(dateTo),
+  });
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

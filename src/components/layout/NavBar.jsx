@@ -1,38 +1,44 @@
-import { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { paths } from '@/routes/paths';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { ROLES, roleLabel } from '@/features/auth/roles';
-import csmLogoSrc from '@/assets/csm-logo.png';
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { paths } from "@/routes/paths";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { ROLES, roleLabel } from "@/features/auth/roles";
+import csmLogoSrc from "@/assets/csm-logo.png";
 
 /* -------------------------------------------------------------------------- */
 /* Shared nav content                                                          */
 /* -------------------------------------------------------------------------- */
 
-function initials(nameOrEmail = '') {
-  const source = nameOrEmail.includes('@')
-    ? nameOrEmail.split('@')[0].replace(/[._-]+/g, ' ')
+function initials(nameOrEmail = "") {
+  const source = nameOrEmail.includes("@")
+    ? nameOrEmail.split("@")[0].replace(/[._-]+/g, " ")
     : nameOrEmail;
   const parts = source.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '?';
+  if (parts.length === 0) return "?";
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 const linkClass = ({ isActive }) =>
   [
-    'flex items-center gap-2.75 rounded-sm border-l-[3px] px-3.25 py-2.75',
-    'font-display text-[13.5px] font-bold transition-colors',
+    "flex items-center gap-2.75 rounded-sm border-l-[3px] px-3.25 py-2.75",
+    "font-display text-[13.5px] font-bold transition-colors",
     isActive
-      ? 'border-l-red bg-blue-soft text-blue'
-      : 'border-l-transparent text-ink-2 hover:bg-surface-2 hover:text-navy',
-  ].join(' ');
+      ? "border-l-red bg-blue-soft text-blue"
+      : "border-l-transparent text-ink-2 hover:bg-surface-2 hover:text-navy",
+  ].join(" ");
 
 const iconClass = (isActive) =>
-  `h-[17px] w-[17px] flex-none ${isActive ? 'text-blue' : 'text-ink-3'}`;
+  `h-[17px] w-[17px] flex-none ${isActive ? "text-blue" : "text-ink-3"}`;
 
 const ClipboardCheckIcon = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" {...props}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.9"
+    {...props}
+  >
     <path d="M9 11l3 3 5-5" />
     <rect x="3" y="4" width="18" height="16" rx="2" />
   </svg>
@@ -69,11 +75,20 @@ const SettingsIcon = (props) => (
 );
 
 const NAV_ITEMS = [
-  { to: paths.dashboard, end: true, label: 'SRT Recommendation', Icon: ClipboardCheckIcon },
-  { to: paths.history, label: 'History', Icon: HistoryIcon },
+  {
+    to: paths.dashboard,
+    end: true,
+    label: "SRT Recommendation",
+    Icon: ClipboardCheckIcon,
+  },
+  { to: paths.history, label: "History", Icon: HistoryIcon },
 ];
 
-const ADMIN_ITEM = { to: paths.admin.root, label: 'Admin Console', Icon: SettingsIcon };
+const ADMIN_ITEM = {
+  to: paths.admin.root,
+  label: "Admin Console",
+  Icon: SettingsIcon,
+};
 
 /**
  * Brand, links, and the user/logout foot. Rendered by both <DesktopNav> and the
@@ -84,9 +99,9 @@ function NavContent({ onNavigate }) {
   const { user, hasRole, logout } = useAuth();
 
   const items = hasRole(ROLES.ADMIN) ? [...NAV_ITEMS, ADMIN_ITEM] : NAV_ITEMS;
-  const name = user?.name ?? user?.username ?? 'Account';
+  const name = user?.name ?? user?.username ?? "Account";
   const role = user?.roles?.[0];
-  const roleText = role ? roleLabel(role) : '';
+  const roleText = role ? roleLabel(role) : "";
 
   const handleLogout = () => {
     onNavigate?.();
@@ -104,7 +119,13 @@ function NavContent({ onNavigate }) {
 
       <nav className="flex flex-col gap-0.75 px-2.5">
         {items.map(({ to, end, label, Icon }) => (
-          <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            onClick={onNavigate}
+            className={linkClass}
+          >
             {({ isActive }) => (
               <>
                 <Icon className={iconClass(isActive)} />
@@ -116,7 +137,7 @@ function NavContent({ onNavigate }) {
       </nav>
 
       <div className="mt-auto flex items-center gap-2.75 border-t border-line px-4 pt-3.5">
-        <span className="flex h-[33px] w-[33px] flex-none items-center justify-center rounded-full bg-navy font-display text-[11.5px] font-bold tracking-[0.04em] text-white">
+        <span className="flex h-8.25 w-8.25 flex-none items-center justify-center rounded-full bg-navy font-display text-[11.5px] font-bold tracking-[0.04em] text-white">
           {initials(name)}
         </span>
         <div className="min-w-0">
@@ -178,20 +199,20 @@ function MobileNav() {
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === "Escape") setOpen(false);
     };
-    document.addEventListener('keydown', onKey);
+    document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
   }, [open]);
 
   return (
     <div className="shrink-0 nav:hidden">
-      <div className="h-[3px] bg-red" />
+      <div className="h-0.75 bg-red" />
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-line bg-surface px-4">
         <button
           type="button"
@@ -218,13 +239,13 @@ function MobileNav() {
       </header>
 
       <div
-        className={`fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`}
+        className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`}
         aria-hidden={!open}
       >
         <div
           onClick={close}
           className={`absolute inset-0 bg-navy/50 transition-opacity duration-200 ${
-            open ? 'opacity-100' : 'opacity-0'
+            open ? "opacity-100" : "opacity-0"
           }`}
         />
         <div
@@ -232,7 +253,7 @@ function MobileNav() {
           aria-modal="true"
           aria-label="Navigation"
           className={`absolute inset-y-0 left-0 flex w-sidebar flex-col overflow-y-auto bg-surface pb-4 pt-5 shadow-pop transition-transform duration-200 ${
-            open ? 'translate-x-0' : '-translate-x-full'
+            open ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <button

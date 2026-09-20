@@ -4,8 +4,8 @@ export const STORY_CHAR_LIMIT = 5000;
 export const REPAIR_ORDER_MAX_LENGTH = 100;
 
 export const CLAIM_CATEGORY = {
-  TRUCK: "truck",
-  ENGINE: "engine",
+  TRUCK: "trk",
+  ENGINE: "eng",
 };
 
 export const CLAIM_CATEGORY_LABELS = {

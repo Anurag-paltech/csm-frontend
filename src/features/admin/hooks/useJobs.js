@@ -6,9 +6,6 @@ export const syncLogKeys = {
   list: (params) => [...syncLogKeys.all, params ?? {}],
 };
 
-// A trigger returns 202 (queued) before the worker has picked the job up —
-// refetch once immediately and once again shortly after so the new
-// "running" row has a chance to actually exist by the time we ask.
 function refreshSyncLogsSoon(queryClient) {
   queryClient.invalidateQueries({ queryKey: syncLogKeys.all });
   setTimeout(

@@ -8,7 +8,14 @@ import { getErrorMessage } from "@/lib/apiError";
  * as the job is queued, not its finished result — so on success this just
  * confirms the queue and points at Sync Logs for progress/outcome.
  */
-export function JobResultModal({ open, onClose, title, isPending, isSuccess, error }) {
+export function JobResultModal({
+  open,
+  onClose,
+  title,
+  isPending,
+  isSuccess,
+  error,
+}) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
       {isPending ? (
@@ -22,8 +29,8 @@ export function JobResultModal({ open, onClose, title, isPending, isSuccess, err
         </p>
       ) : isSuccess ? (
         <p className="text-[13px] text-ink-2">
-          Job queued. It may take a moment to start — check Sync Logs below
-          for progress and results.
+          Job queued. It may take a moment to start — check Sync Logs below for
+          progress and results.
         </p>
       ) : null}
 

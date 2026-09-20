@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router-dom';
-import { NavBar } from '@/components/layout/NavBar';
+import { Outlet } from "react-router-dom";
+import { NavBar } from "@/components/layout/NavBar";
 
 /**
  * Chrome for all authenticated pages. The shell is exactly one viewport tall and

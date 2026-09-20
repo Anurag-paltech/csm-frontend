@@ -136,8 +136,7 @@ export function SyncLogsTable({
               const isOpen = expanded.has(key);
               const isStale =
                 r.status === "running" &&
-                Date.now() - new Date(r.date_time).getTime() >
-                  STALE_RUNNING_MS;
+                Date.now() - new Date(r.date_time).getTime() > STALE_RUNNING_MS;
               return (
                 <Fragment key={key}>
                   <tr className="hover:bg-surface-2">

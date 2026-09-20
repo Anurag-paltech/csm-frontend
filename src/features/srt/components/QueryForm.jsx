@@ -256,6 +256,7 @@ export function QueryForm({ onSuccess, initialValues = null }) {
                     onCategoryChange(e.target.value);
                   }}
                   invalid={Boolean(errors.claim_category)}
+                  placeholder={field.value === ""}
                   className="w-full"
                 >
                   <option value="" disabled>

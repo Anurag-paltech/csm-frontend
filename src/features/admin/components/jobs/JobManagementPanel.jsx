@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { useRunClaimsSync, useRunSrtSync } from "@/features/admin/hooks/useJobs";
+import {
+  useRunClaimsSync,
+  useRunSrtSync,
+} from "@/features/admin/hooks/useJobs";
 import { JobResultModal } from "@/features/admin/components/jobs/JobResultModal";
 import { SyncLogsPanel } from "@/features/admin/components/jobs/SyncLogsPanel";
 
@@ -16,9 +19,7 @@ function JobRow({ name, description, run }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-md border border-line bg-surface px-4.5 py-3.5">
       <div>
-        <p className="font-display text-[13.5px] font-bold text-navy">
-          {name}
-        </p>
+        <p className="font-display text-[13.5px] font-bold text-navy">{name}</p>
         <p className="mt-0.5 text-[12.5px] text-ink-3">{description}</p>
       </div>
       <Button onClick={trigger} disabled={run.isPending} className="shrink-0">

@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { getErrorMessage } from '@/lib/apiError';
-import { useUpdateSelection } from '@/features/srt/hooks/useSrtRecommendation';
+import { useState } from "react";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { getErrorMessage } from "@/lib/apiError";
+import { useUpdateSelection } from "@/features/srt/hooks/useSrtRecommendation";
 
-const BAND_TONE = { high: 'green', medium: 'blue', low: 'neutral' };
-const BAND_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+const BAND_TONE = { high: "green", medium: "blue", low: "neutral" };
+const BAND_LABEL = { high: "High", medium: "Medium", low: "Low" };
 const hoursOf = (item) => Number(item.hours) || 0;
 const confidencePct = (item) => Math.round((item.confidence_score ?? 0) * 100);
 const bandKey = (item) => item.confidence_band?.toLowerCase();
 
 const th =
-  'sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left';
-const td = 'border-b border-line px-3.5 py-3 align-middle';
+  "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left";
+const td = "border-b border-line px-3.5 py-3 align-middle";
 
 function TrashIcon(props) {
   return (
@@ -48,7 +48,7 @@ export function SelectedSrtSummary({
     );
     lines.push(`\tTotal\t${totalHours.toFixed(1)}`);
     try {
-      await navigator.clipboard.writeText(lines.join('\n'));
+      await navigator.clipboard.writeText(lines.join("\n"));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -72,10 +72,10 @@ export function SelectedSrtSummary({
     <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center justify-between border-b border-line px-5.5 py-3.25">
         <span className="font-display text-[13.5px] font-bold text-navy">
-          {items.length} selected {items.length === 1 ? 'code' : 'codes'}
+          {items.length} selected {items.length === 1 ? "code" : "codes"}
         </span>
-        <Button variant="secondary" onClick={onBack}>
-          Back to recommendations
+        <Button variant="secondary" onClick={onNewQuery}>
+          Start a new query
         </Button>
       </div>
 
@@ -103,19 +103,25 @@ export function SelectedSrtSummary({
             <tbody>
               {items.map((item) => (
                 <tr key={item.srt_code} className="hover:bg-surface-2">
-                  <td className={`${td} whitespace-nowrap font-display font-bold text-navy`}>
+                  <td
+                    className={`${td} whitespace-nowrap font-display font-bold text-navy`}
+                  >
                     {item.srt_code}
                   </td>
                   <td className={td}>{item.description}</td>
                   <td className={td}>
-                    <Badge tone={BAND_TONE[bandKey(item)] ?? 'neutral'}>
+                    <Badge tone={BAND_TONE[bandKey(item)] ?? "neutral"}>
                       <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {BAND_LABEL[bandKey(item)] ?? item.confidence_band} ·{' '}
+                      {BAND_LABEL[bandKey(item)] ?? item.confidence_band} ·{" "}
                       {confidencePct(item)}%
                     </Badge>
                   </td>
-                  <td className={`${td} whitespace-nowrap tabular-nums font-bold`}>
-                    {item.hours == null ? '—' : `${hoursOf(item).toFixed(1)} hrs`}
+                  <td
+                    className={`${td} whitespace-nowrap tabular-nums font-bold`}
+                  >
+                    {item.hours == null
+                      ? "—"
+                      : `${hoursOf(item).toFixed(1)} hrs`}
                   </td>
                   <td className={`${td} text-right`}>
                     <button
@@ -138,12 +144,15 @@ export function SelectedSrtSummary({
       <div className="shrink-0 border-t border-line p-5.5">
         {updateSelection.isError ? (
           <p className="mb-3 text-[12px] font-bold text-red">
-            {getErrorMessage(updateSelection.error, 'Could not update selection.')}
+            {getErrorMessage(
+              updateSelection.error,
+              "Could not update selection.",
+            )}
           </p>
         ) : null}
 
         <div className="flex items-center justify-between rounded-md bg-navy px-4.5 py-3.25 text-white">
-          <span className="font-display text-[10.5px] font-bold uppercase tracking-[0.1em] text-navy-border">
+          <span className="font-display text-[10.5px] font-bold uppercase tracking-widest text-navy-border">
             Total standard hours
           </span>
           <span className="font-display text-[18px] font-bold">
@@ -152,11 +161,11 @@ export function SelectedSrtSummary({
         </div>
 
         <div className="mt-4 flex items-center justify-end gap-2.5">
-          <Button variant="ghost" onClick={onNewQuery}>
-            Start a new query
+          <Button variant="ghost" onClick={onBack}>
+            Back to recommendations
           </Button>
           <Button onClick={copyForClaim} disabled={items.length === 0}>
-            {copied ? 'Copied' : 'Copy for claim system'}
+            {copied ? "Copied" : "Copy for claim system"}
           </Button>
         </div>
       </div>
