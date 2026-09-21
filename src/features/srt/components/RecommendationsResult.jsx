@@ -183,7 +183,9 @@ export function RecommendationsResult({
     () => new Set(items.filter((i) => i.selected).map((i) => i.srt_code)),
   );
   const [filter, setFilter] = useState("");
-  const [minConfidence, setMinConfidence] = useState(env.defaultMinConfidence);
+  const [minConfidence, setMinConfidence] = useState(
+    String(env.defaultMinConfidence),
+  );
   const [minHours, setMinHours] = useState(env.defaultMinHours);
   const [selectedSources, setSelectedSources] = useState(() => new Set());
   const [expanded, setExpanded] = useState(null);
@@ -195,10 +197,15 @@ export function RecommendationsResult({
     setOffset(0);
   };
   const onMinConfidenceChange = (e) => {
-    const raw = Number(e.target.value);
-    setMinConfidence(
-      Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0,
-    );
+    const value = e.target.value;
+    if (value === "") {
+      setMinConfidence("");
+    } else {
+      const raw = Number(value);
+      if (Number.isFinite(raw)) {
+        setMinConfidence(String(Math.max(0, Math.min(100, raw))));
+      }
+    }
     setOffset(0);
   };
   const onMinHoursChange = (e) => {
@@ -223,15 +230,18 @@ export function RecommendationsResult({
     return [...set].sort();
   }, [items]);
 
+  const minConfidenceNum =
+    minConfidence === "" ? env.defaultMinConfidence : Number(minConfidence);
+
   const hasActiveFilters =
     Boolean(filter) ||
-    minConfidence !== env.defaultMinConfidence ||
+    minConfidenceNum !== env.defaultMinConfidence ||
     minHours !== env.defaultMinHours ||
     selectedSources.size > 0;
 
   const clearFilters = () => {
     setFilter("");
-    setMinConfidence(env.defaultMinConfidence);
+    setMinConfidence(String(env.defaultMinConfidence));
     setMinHours(env.defaultMinHours);
     setSelectedSources(new Set());
     setOffset(0);
@@ -244,7 +254,7 @@ export function RecommendationsResult({
       if (q && !`${i.srt_code} ${i.description}`.toLowerCase().includes(q)) {
         return false;
       }
-      if (confidencePct(i) < minConfidence) return false;
+      if (confidencePct(i) < minConfidenceNum) return false;
       if (
         selectedSources.size > 0 &&
         !(i.sources ?? []).some((s) => selectedSources.has(s))
@@ -259,7 +269,7 @@ export function RecommendationsResult({
     return [...filtered].sort(
       (a, b) => (b.confidence_score ?? 0) - (a.confidence_score ?? 0),
     );
-  }, [items, filter, minConfidence, minHours, selectedSources]);
+  }, [items, filter, minConfidenceNum, minHours, selectedSources]);
 
   const paged = useMemo(
     () => visible.slice(offset, offset + pageSize),
@@ -349,8 +359,9 @@ export function RecommendationsResult({
                 step={5}
                 value={minConfidence}
                 onChange={onMinConfidenceChange}
+                placeholder="0"
                 aria-label="Minimum confidence percent"
-                className="w-8 border-0 bg-transparent p-0 text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                className="w-8 border-0 bg-transparent p-0 text-right text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               />
               <span className="text-[11px] text-ink-3">%</span>
             </div>
@@ -367,7 +378,7 @@ export function RecommendationsResult({
                 onChange={onMinHoursChange}
                 placeholder="0.0"
                 aria-label="Minimum standard hours"
-                className="w-10 border-0 bg-transparent p-0 text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                className="w-10 border-0 bg-transparent p-0 text-right text-[12.5px] text-ink [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               />
               <span className="text-[11px] text-ink-3">hrs</span>
             </div>

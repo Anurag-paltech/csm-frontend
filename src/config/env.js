@@ -25,7 +25,9 @@ const env = {
 
   /** Default filters for recommendations screen. */
   defaultMinConfidence:
-    Number(import.meta.env.VITE_DEFAULT_MIN_CONFIDENCE) || 0,
+    import.meta.env.VITE_DEFAULT_MIN_CONFIDENCE !== undefined
+      ? Number(import.meta.env.VITE_DEFAULT_MIN_CONFIDENCE)
+      : 40,
   defaultMinHours: import.meta.env.VITE_DEFAULT_MIN_HOURS ?? "",
 };
 
