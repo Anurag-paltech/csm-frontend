@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Pager } from "@/components/ui/Pager";
 import { getErrorMessage } from "@/lib/apiError";
+import { formatHours } from "@/lib/format";
 import env from "@/config/env";
 import { CLAIM_CATEGORY_LABELS } from "@/features/srt/schemas/querySchema";
 import { useUpdateSelection } from "@/features/srt/hooks/useSrtRecommendation";
@@ -468,7 +469,7 @@ export function RecommendationsResult({
                   <b className="font-bold text-navy">{selected.size}</b> of{" "}
                   {items.length} selected ·{" "}
                   <b className="font-bold text-navy">
-                    {totalHours.toFixed(1)} hrs
+                    {formatHours(totalHours)} hrs
                   </b>
                 </>
               )}
@@ -521,7 +522,7 @@ function FragmentRow({ item, checked, onToggle, open, onWhy }) {
         </td>
         <td className={td}>{item.description}</td>
         <td className={`${td} whitespace-nowrap tabular-nums font-bold`}>
-          {item.hours == null ? "—" : `${hoursOf(item).toFixed(1)} hrs`}
+          {item.hours == null ? "—" : `${formatHours(item.hours)} hrs`}
         </td>
         <td className={td}>
           <Badge tone={BAND_TONE[bandKey(item)] ?? "neutral"}>

@@ -38,6 +38,11 @@ export function formatDateTime(value, fallback = '—') {
   return d ? DATE_TIME_FMT.format(d) : fallback;
 }
 
+export function formatHours(value, fallback = '—') {
+  const n = Number(value);
+  return Number.isFinite(n) ? String(Number(n.toFixed(4))) : fallback;
+}
+
 /** Grouped integer ("1,234"), or `fallback` for non-numbers. */
 export function formatNumber(value, fallback = '—') {
   return typeof value === 'number' && Number.isFinite(value)

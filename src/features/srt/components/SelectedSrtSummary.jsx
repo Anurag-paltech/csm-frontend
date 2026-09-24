@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getErrorMessage } from "@/lib/apiError";
+import { formatHours } from "@/lib/format";
 import { useUpdateSelection } from "@/features/srt/hooks/useSrtRecommendation";
 
 const BAND_TONE = { high: "green", medium: "blue", low: "neutral" };
@@ -44,9 +45,9 @@ export function SelectedSrtSummary({
 
   const copyForClaim = async () => {
     const lines = items.map(
-      (i) => `${i.srt_code}\t${i.description}\t${hoursOf(i).toFixed(1)}`,
+      (i) => `${i.srt_code}\t${i.description}\t${formatHours(hoursOf(i))}`,
     );
-    lines.push(`\tTotal\t${totalHours.toFixed(1)}`);
+    lines.push(`\tTotal\t${formatHours(totalHours)}`);
     try {
       await navigator.clipboard.writeText(lines.join("\n"));
       setCopied(true);
@@ -119,9 +120,7 @@ export function SelectedSrtSummary({
                   <td
                     className={`${td} whitespace-nowrap tabular-nums font-bold`}
                   >
-                    {item.hours == null
-                      ? "—"
-                      : `${hoursOf(item).toFixed(1)} hrs`}
+                    {item.hours == null ? "—" : `${formatHours(item.hours)} hrs`}
                   </td>
                   <td className={`${td} text-right`}>
                     <button
@@ -156,7 +155,7 @@ export function SelectedSrtSummary({
             Total standard hours
           </span>
           <span className="font-display text-[18px] font-bold">
-            {totalHours.toFixed(1)} hrs
+            {formatHours(totalHours)} hrs
           </span>
         </div>
 
