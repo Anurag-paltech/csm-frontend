@@ -240,7 +240,7 @@ export function RecommendationsResult({
     minHours !== env.defaultMinHours ||
     selectedSources.size > 0;
 
-  const clearFilters = () => {
+  const resetFilters = () => {
     setFilter("");
     setMinConfidence(String(env.defaultMinConfidence));
     setMinHours(env.defaultMinHours);
@@ -396,10 +396,10 @@ export function RecommendationsResult({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={clearFilters}
+                onClick={resetFilters}
                 className="ml-auto"
               >
-                Clear filters
+                Reset filters
               </Button>
             ) : null}
           </div>
