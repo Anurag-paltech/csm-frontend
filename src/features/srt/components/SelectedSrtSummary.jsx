@@ -12,6 +12,24 @@ const hoursOf = (item) => Number(item.hours) || 0;
 const confidencePct = (item) => Math.round((item.confidence_score ?? 0) * 100);
 const bandKey = (item) => item.confidence_band?.toLowerCase();
 
+// Strip characters that would be misread as extra column/row breaks when
+// pasted into a spreadsheet (a TSV cell can't contain a literal tab or
+// newline — a stray one in a description would otherwise split that one
+// cell into several).
+const tsvCell = (value) =>
+  String(value ?? "")
+    .replace(/[\t\r\n]+/g, " ")
+    .trim();
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const htmlRow = (cells, tag = "td") =>
+  `<tr>${cells.map((c) => `<${tag}>${escapeHtml(c)}</${tag}>`).join("")}</tr>`;
+
 const th =
   "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left";
 const td = "border-b border-line px-3.5 py-3 align-middle";
@@ -44,12 +62,35 @@ export function SelectedSrtSummary({
   const updateSelection = useUpdateSelection(recommendationId);
 
   const copyForClaim = async () => {
-    const lines = items.map(
-      (i) => `${i.srt_code}\t${i.description}\t${formatHours(hoursOf(i))}`,
-    );
-    lines.push(`\tTotal\t${formatHours(totalHours)}`);
+    const header = ["SRT code", "Description", "Std hours"];
+    const rows = items.map((i) => [
+      tsvCell(i.srt_code),
+      tsvCell(i.description),
+      formatHours(hoursOf(i)),
+    ]);
+    const totalRow = ["", "Total", formatHours(totalHours)];
+
+    // Plain text (TSV) is what Excel/Sheets read as a grid; an HTML table
+    // alongside it is what Word/Outlook/Gmail render as an actual table
+    // instead of raw tab characters. Each app picks whichever it understands.
+    const text = [header, ...rows, totalRow]
+      .map((cells) => cells.join("\t"))
+      .join("\n");
+    const html = `<table>${htmlRow(header, "th")}${rows
+      .map((r) => htmlRow(r))
+      .join("")}${htmlRow(totalRow)}</table>`;
+
     try {
-      await navigator.clipboard.writeText(lines.join("\n"));
+      if (window.ClipboardItem) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/plain": new Blob([text], { type: "text/plain" }),
+            "text/html": new Blob([html], { type: "text/html" }),
+          }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
