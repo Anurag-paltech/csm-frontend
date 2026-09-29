@@ -58,6 +58,66 @@
   --spacing-sidebar: 236px;
   /* nav flips from sidebar to top-bar + drawer below this (mockup's breakpoint) */
   --breakpoint-nav: 900px;
+
+  /* motion — the "getting recommendations" bot-thinking loader */
+  --animate-bot-bob: bot-bob 2.4s ease-in-out infinite;
+  --animate-bot-blink: bot-blink 3.2s ease-in-out infinite;
+  --animate-dot-bounce: dot-bounce 1.2s ease-in-out infinite;
+  --animate-step-in: step-in 0.25s ease-out;
+}
+
+@keyframes bot-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes bot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bot-bob,
+  .animate-bot-blink,
+  .animate-dot-bounce,
+  .animate-step-in {
+    animation: none;
+  }
 }
 
 html,

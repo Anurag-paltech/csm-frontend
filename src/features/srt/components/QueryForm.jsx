@@ -19,6 +19,7 @@ import {
   useEngineModels,
 } from "@/features/srt/hooks/useLookups";
 import { useCreateRecommendation } from "@/features/srt/hooks/useSrtRecommendation";
+import { RecommendationLoadingOverlay } from "@/features/srt/components/RecommendationLoadingOverlay";
 import {
   querySchema,
   queryDefaultValues,
@@ -101,6 +102,7 @@ export function QueryForm({ onSuccess, initialValues = null }) {
   });
 
   const [formError, setFormError] = useState(null);
+  const [submittedQuery, setSubmittedQuery] = useState(null);
   const recommend = useCreateRecommendation();
 
   // VIN
@@ -180,6 +182,17 @@ export function QueryForm({ onSuccess, initialValues = null }) {
 
   const submit = async (values) => {
     setFormError(null);
+    setSubmittedQuery({
+      vin: values.vin,
+      category: values.claim_category,
+      truckModel: values.truck_model,
+      isEngine,
+      engineMake: values.engine_make,
+      engineModel: values.engine_model,
+      causalPart: values.causal_part_number,
+      dealerCode: values.dealer_code,
+      repairOrder: values.repair_order_number,
+    });
     try {
       const payload = toRecommendationPayload({
         ...values,
@@ -207,8 +220,11 @@ export function QueryForm({ onSuccess, initialValues = null }) {
       as="form"
       onSubmit={handleSubmit(submit)}
       noValidate
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
     >
+      {recommend.isPending ? (
+        <RecommendationLoadingOverlay query={submittedQuery} />
+      ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto p-5.5">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
           <FormField
