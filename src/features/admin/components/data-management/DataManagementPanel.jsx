@@ -3,15 +3,18 @@ import { DealerCodesPanel } from "@/features/admin/components/data-management/de
 import { CampaignExclusionsPanel } from "@/features/admin/components/data-management/campaign/CampaignExclusionsPanel";
 import { ClaimCategoryExclusionsPanel } from "@/features/admin/components/data-management/claim-category/ClaimCategoryExclusionsPanel";
 import { CrossRefPanel } from "@/features/admin/components/data-management/cross-ref/CrossRefPanel";
+import { TruckEngineMappingsPanel } from "@/features/admin/components/data-management/truck-engine/TruckEngineMappingsPanel";
 
 const SUBTABS = [
   { id: "dealer", label: "Dealer" },
   { id: "campaign", label: "Campaign Exclusion" },
   { id: "claim-category", label: "Claim Category Exclusion" },
   { id: "cross-ref", label: "SRT Cross Ref" },
+  { id: "truck-engine", label: "Truck/Engine Mapping" },
 ];
 
-/** Admin → Data Management. Sub-tabbed: Dealer, Campaign, Claim Category, Cross Ref. */
+/** Admin → Data Management. Sub-tabbed: Dealer, Campaign, Claim Category, Cross Ref,
+ * Truck/Engine Mapping. */
 export function DataManagementPanel() {
   const [subtab, setSubtab] = useState("dealer");
 
@@ -42,8 +45,10 @@ export function DataManagementPanel() {
           <CampaignExclusionsPanel />
         ) : subtab === "claim-category" ? (
           <ClaimCategoryExclusionsPanel />
-        ) : (
+        ) : subtab === "cross-ref" ? (
           <CrossRefPanel />
+        ) : (
+          <TruckEngineMappingsPanel />
         )}
       </div>
     </div>

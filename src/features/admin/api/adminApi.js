@@ -83,6 +83,37 @@ export const adminApi = {
     return data;
   },
 
+  /** GET `/admin/truck-engine-mappings` — `model_name` is "trk" | "eng". */
+  async listTruckEngineMappings({ limit = 50, offset = 0, model_name, q } = {}) {
+    const params = { limit, offset };
+    if (model_name) params.model_name = model_name;
+    if (q) params.q = q;
+    const { data } = await apiClient.get("/admin/truck-engine-mappings", {
+      params,
+    });
+    return data;
+  },
+
+  /** POST `/admin/truck-engine-mappings` */
+  async createTruckEngineMapping(body) {
+    const { data } = await apiClient.post("/admin/truck-engine-mappings", body);
+    return data;
+  },
+
+  /** PUT `/admin/truck-engine-mappings/{id}` — full replace, all fields required. */
+  async updateTruckEngineMapping(id, body) {
+    const { data } = await apiClient.put(
+      `/admin/truck-engine-mappings/${id}`,
+      body,
+    );
+    return data;
+  },
+
+  /** DELETE `/admin/truck-engine-mappings/{id}` — 204, no body. */
+  async deleteTruckEngineMapping(id) {
+    await apiClient.delete(`/admin/truck-engine-mappings/${id}`);
+  },
+
   /** GET notification lists — `/admin/notification-lists` */
   async listNotificationLists({ limit = 50, offset = 0, q } = {}) {
     const params = { limit, offset };
