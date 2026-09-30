@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Modal } from "@/components/ui/Modal";
 import { Pager } from "@/components/ui/Pager";
 import { getErrorMessage } from "@/lib/apiError";
 import { formatHours } from "@/lib/format";
@@ -184,6 +185,11 @@ export function RecommendationsResult({
     () => new Set(items.filter((i) => i.selected).map((i) => i.srt_code)),
   );
   const [filter, setFilter] = useState("");
+  const [lowConfidencePrompt, setLowConfidencePrompt] = useState(
+    () =>
+      items.length > 0 &&
+      items.every((i) => confidencePct(i) < env.defaultMinConfidence),
+  );
   const [minConfidence, setMinConfidence] = useState(
     String(env.defaultMinConfidence),
   );
@@ -231,8 +237,7 @@ export function RecommendationsResult({
     return [...set].sort();
   }, [items]);
 
-  const minConfidenceNum =
-    minConfidence === "" ? env.defaultMinConfidence : Number(minConfidence);
+  const minConfidenceNum = minConfidence === "" ? 0 : Number(minConfidence);
 
   const hasActiveFilters =
     Boolean(filter) ||
@@ -303,6 +308,30 @@ export function RecommendationsResult({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <QueryChips query={recommendation.query} onEdit={onEditQuery} />
+
+      <Modal
+        open={lowConfidencePrompt}
+        onClose={() => setLowConfidencePrompt(false)}
+        title="No strong matches"
+      >
+        <p className="text-sm text-ink-2">
+          No results are above {env.defaultMinConfidence}% confidence. Show all
+          results instead?
+        </p>
+        <div className="mt-5 flex justify-end gap-2.5">
+          <Button variant="ghost" onClick={() => setLowConfidencePrompt(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setMinConfidence("0");
+              setLowConfidencePrompt(false);
+            }}
+          >
+            Show all
+          </Button>
+        </div>
+      </Modal>
 
       {noMatch ? (
         <div className="flex items-center gap-3 rounded-md border border-navy-border border-l-4 border-l-navy bg-navy-soft px-5 py-4">
