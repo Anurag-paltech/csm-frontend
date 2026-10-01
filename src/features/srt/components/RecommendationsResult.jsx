@@ -315,8 +315,9 @@ export function RecommendationsResult({
         title="No strong matches"
       >
         <p className="text-sm text-ink-2">
-          No results are above {env.defaultMinConfidence}% confidence. Show all
-          results instead?
+          There are no SRT recommendations with confidence scores above the
+          defined threshold. Would you like to see the SRT codes with lower
+          confidence scores?
         </p>
         <div className="mt-5 flex justify-end gap-2.5">
           <Button variant="ghost" onClick={() => setLowConfidencePrompt(false)}>
