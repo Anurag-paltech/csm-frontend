@@ -156,14 +156,45 @@ function SourceMultiSelect({ options, selected, onToggle }) {
 const DEFAULT_PAGE_SIZE = 10;
 
 const COLS = [
-  "",
-  "SRT Code",
-  "Description",
-  "STD hours",
-  "Confidence",
-  "Source",
-  "",
+  { label: "" },
+  { label: "SRT Code", sortKey: "srt_code" },
+  { label: "Description" },
+  { label: "STD hours", sortKey: "hours" },
+  { label: "Confidence", sortKey: "confidence" },
+  { label: "Source" },
+  { label: "" },
 ];
+
+/** Direction a column sorts in on its first click. */
+const FIRST_SORT_DIR = { srt_code: "asc", hours: "desc", confidence: "desc" };
+const DEFAULT_SORT = { key: "confidence", dir: "desc" };
+
+/** Ascending comparators. Rows with no hours always sort last. */
+const SORTERS = {
+  srt_code: (a, b) =>
+    String(a.srt_code ?? "").localeCompare(String(b.srt_code ?? ""), undefined, {
+      numeric: true,
+    }),
+  hours: (a, b) => Number(a.hours) - Number(b.hours),
+  confidence: (a, b) => (a.confidence_score ?? 0) - (b.confidence_score ?? 0),
+};
+
+function SortArrow({ dir }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.6"
+      aria-hidden="true"
+      className={`h-2.5 w-2.5 transition-transform ${
+        dir ? "" : "opacity-30"
+      } ${dir === "asc" ? "rotate-180" : ""}`}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
 const th =
   "sticky top-0 z-10 border-b border-line bg-surface-2 px-3.5 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.09em] text-navy text-left";
 const td = "border-b border-line px-3.5 py-3 align-middle";
@@ -198,6 +229,16 @@ export function RecommendationsResult({
   const [expanded, setExpanded] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [offset, setOffset] = useState(0);
+  const [sort, setSort] = useState(DEFAULT_SORT);
+
+  const onSort = (key) => {
+    setSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: FIRST_SORT_DIR[key] },
+    );
+    setOffset(0);
+  };
 
   const onFilterChange = (e) => {
     setFilter(e.target.value);
@@ -272,10 +313,17 @@ export function RecommendationsResult({
       }
       return true;
     });
-    return [...filtered].sort(
-      (a, b) => (b.confidence_score ?? 0) - (a.confidence_score ?? 0),
-    );
-  }, [items, filter, minConfidenceNum, minHours, selectedSources]);
+    const compare = SORTERS[sort.key];
+    const sign = sort.dir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      if (sort.key === "hours") {
+        const aMissing = a.hours == null || a.hours === "";
+        const bMissing = b.hours == null || b.hours === "";
+        if (aMissing || bMissing) return aMissing - bMissing;
+      }
+      return sign * compare(a, b);
+    });
+  }, [items, filter, minConfidenceNum, minHours, selectedSources, sort]);
 
   const paged = useMemo(
     () => visible.slice(offset, offset + pageSize),
@@ -316,8 +364,8 @@ export function RecommendationsResult({
       >
         <p className="text-sm text-ink-2">
           There are no SRT recommendations with confidence scores above the
-          defined threshold. Would you like to see the SRT codes with lower
-          confidence scores?
+          defined threshold. Are your fields accurate? If they are correct,
+          would you like to see the SRT codes with lower confidence scores?
         </p>
         <div className="mt-5 flex justify-end gap-2.5">
           <Button variant="ghost" onClick={() => setLowConfidencePrompt(false)}>
@@ -438,11 +486,38 @@ export function RecommendationsResult({
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr>
-                  {COLS.map((c, i) => (
-                    <th key={i} className={th}>
-                      {c}
-                    </th>
-                  ))}
+                  {COLS.map((c, i) => {
+                    if (!c.sortKey) {
+                      return (
+                        <th key={i} className={th}>
+                          {c.label}
+                        </th>
+                      );
+                    }
+                    const dir = sort.key === c.sortKey ? sort.dir : null;
+                    return (
+                      <th
+                        key={i}
+                        className={th}
+                        aria-sort={
+                          dir === "asc"
+                            ? "ascending"
+                            : dir === "desc"
+                              ? "descending"
+                              : "none"
+                        }
+                      >
+                        <button
+                          type="button"
+                          onClick={() => onSort(c.sortKey)}
+                          className="inline-flex items-center gap-1 uppercase tracking-[inherit] hover:text-blue"
+                        >
+                          {c.label}
+                          <SortArrow dir={dir} />
+                        </button>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
