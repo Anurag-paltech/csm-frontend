@@ -30,6 +30,22 @@ export function useRunSrtSync() {
   });
 }
 
+export function useRunClaimsIngestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.runClaimsIngestion,
+    onSuccess: () => refreshSyncLogsSoon(queryClient),
+  });
+}
+
+export function useRunSrtCatalogueIngestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.runSrtCatalogueIngestion,
+    onSuccess: () => refreshSyncLogsSoon(queryClient),
+  });
+}
+
 export function useSyncLogs(params, options = {}) {
   return useQuery({
     queryKey: syncLogKeys.list(params),

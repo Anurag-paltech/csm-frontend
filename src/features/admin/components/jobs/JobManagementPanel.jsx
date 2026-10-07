@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import {
+  useRunClaimsIngestion,
   useRunClaimsSync,
+  useRunSrtCatalogueIngestion,
   useRunSrtSync,
 } from "@/features/admin/hooks/useJobs";
 import { JobResultModal } from "@/features/admin/components/jobs/JobResultModal";
@@ -53,10 +55,12 @@ function JobRow({ name, description, run }) {
 export function JobManagementPanel() {
   const claimsSync = useRunClaimsSync();
   const srtSync = useRunSrtSync();
+  const claimsIngestion = useRunClaimsIngestion();
+  const srtCatalogueIngestion = useRunSrtCatalogueIngestion();
 
   return (
     <div className="flex h-full flex-col gap-5 p-5.5">
-      <div className="flex shrink-0 flex-col gap-3">
+      <div className="grid shrink-0 grid-cols-1 gap-3 lg:grid-cols-2">
         <JobRow
           name="Claims Sync"
           description="Runs a full claims sync on the Function app (default params, no scoping)."
@@ -66,6 +70,16 @@ export function JobManagementPanel() {
           name="SRT Sync"
           description="Runs a full SRT operation codes bulk refresh."
           run={srtSync}
+        />
+        <JobRow
+          name="Claims Ingestion"
+          description="Starts claims ingestion."
+          run={claimsIngestion}
+        />
+        <JobRow
+          name="SRT Catalogue Ingestion"
+          description="Starts SRT catalogue ingestion."
+          run={srtCatalogueIngestion}
         />
       </div>
 

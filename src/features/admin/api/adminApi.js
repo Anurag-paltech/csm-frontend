@@ -151,6 +151,18 @@ export const adminApi = {
     return data;
   },
 
+  /** `POST /admin/ingestion/claims` — starts claims ingestion. No body. */
+  async runClaimsIngestion() {
+    const { data } = await apiClient.post("/admin/ingestion/claims");
+    return data;
+  },
+
+  /** `POST /admin/ingestion/srt-catalogue` — starts SRT catalogue ingestion. No body. */
+  async runSrtCatalogueIngestion() {
+    const { data } = await apiClient.post("/admin/ingestion/srt-catalogue");
+    return data;
+  },
+
   /** GET `/admin/sync-logs?start_date=&end_date=` — both `YYYYMMDD`, optional. */
   async getSyncLogs({ start_date, end_date } = {}) {
     const params = {};
